@@ -18,6 +18,104 @@ export interface House {
   meaning: string;
 }
 
+export interface Element {
+  name: string;
+  symbol: string;
+  color: string;
+  meaning: string;
+  traits: string[];
+  positive: string[];
+  negative: string[];
+  signs: string[];
+}
+
+export interface Modality {
+  name: string;
+  symbol: string;
+  color: string;
+  meaning: string;
+  traits: string[];
+  positive: string[];
+  negative: string[];
+  signs: string[];
+}
+
+export interface KnowledgePlanet {
+  name: string;
+  symbol: string;
+  meaning: string;
+  keywords: string[];
+  domain: string[];
+  positive: string[];
+  negative: string[];
+  inDice: string;
+  relatedSigns: string[];
+  relatedHouses: number[];
+}
+
+export interface KnowledgeSign {
+  name: string;
+  symbol: string;
+  element: string;
+  modality: string;
+  meaning: string;
+  keywords: string[];
+  traits: string[];
+  positive: string[];
+  negative: string[];
+  ruler: string;
+  inDice: string;
+  relatedPlanets: string[];
+}
+
+export interface KnowledgeHouse {
+  number: number;
+  name: string;
+  meaning: string;
+  keywords: string[];
+  domain: string[];
+  positive: string[];
+  negative: string[];
+  ruler: string;
+  inDice: string;
+  relatedSigns: string[];
+}
+
+export interface PlanetSignCombo {
+  planet: string;
+  sign: string;
+  meaning: string;
+  keyThemes: string[];
+}
+
+export interface PlanetHouseCombo {
+  planet: string;
+  house: number;
+  meaning: string;
+  keyThemes: string[];
+}
+
+export interface SignHouseCombo {
+  sign: string;
+  house: number;
+  meaning: string;
+  keyThemes: string[];
+}
+
+export interface KnowledgeBase {
+  planets: KnowledgePlanet[];
+  signs: KnowledgeSign[];
+  houses: KnowledgeHouse[];
+  elements: Element[];
+  modalities: Modality[];
+  planetSignCombos: PlanetSignCombo[];
+  planetHouseCombos: PlanetHouseCombo[];
+  signHouseCombos: SignHouseCombo[];
+}
+
+export type KnowledgeCategory = 'all' | 'planets' | 'signs' | 'houses' | 'elements' | 'modalities' | 'combos';
+export type KnowledgeItemType = KnowledgePlanet | KnowledgeSign | KnowledgeHouse | Element | Modality | PlanetSignCombo | PlanetHouseCombo | SignHouseCombo;
+
 export interface DiceResult {
   planet: Planet;
   sign: Sign;
