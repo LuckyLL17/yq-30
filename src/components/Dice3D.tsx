@@ -49,6 +49,14 @@ const Dice3D: React.FC<Dice3DProps> = ({
     lg: 'w-14 h-3',
   };
 
+  const glowSizes = {
+    sm: 'w-20 h-20',
+    md: 'w-28 h-28',
+    lg: 'w-36 h-36',
+  };
+
+  const isMagic = animationName === 'dice-magic-roll';
+
   const faceSymbols = useMemo(() => {
     if (allSymbols && allSymbols.length >= 6) {
       const shuffled = [...allSymbols].sort(() => Math.random() - 0.5);
@@ -73,16 +81,34 @@ const Dice3D: React.FC<Dice3DProps> = ({
   const finalGlowColor = glowColor || gradientTo;
 
   return (
-    <div 
-      className="relative" 
-      style={{ 
-        perspective: '1000px',
+    <div
+      className="relative"
+      style={{
+        perspective: '1200px',
         perspectiveOrigin: '50% 50%',
       }}
     >
+      {isMagic && isRolling && (
+        <div
+          className={`absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 ${glowSizes[size]} pointer-events-none rounded-full`}
+          style={{
+            zIndex: 0,
+            animationName: 'dice-magic-glow',
+            animationDuration: `${animationDuration}ms`,
+            animationTimingFunction: animationEasing,
+            animationDelay: `${delay}ms`,
+            animationFillMode: 'forwards',
+            background: `radial-gradient(circle, ${finalGlowColor}90 0%, ${finalGlowColor}50 25%, transparent 60%)`,
+            boxShadow: `0 0 60px ${finalGlowColor}60, 0 0 120px ${finalGlowColor}30`,
+            mixBlendMode: 'screen',
+          }}
+        />
+      )}
+
       <div
         className={`${sizeClasses[size]} relative`}
         style={{
+          zIndex: 1,
           transformStyle: 'preserve-3d',
           '--half-size': `${halfSize}px`,
         } as React.CSSProperties}
@@ -145,8 +171,9 @@ const Dice3D: React.FC<Dice3DProps> = ({
       </div>
 
       <div
-        className={`absolute left-1/2 -translate-x-1/2 ${shadowSizes[size]} rounded-full blur-md transition-all duration-300`}
+        className={`absolute left-1/2 -translate-x-1/2 ${shadowSizes[size]} rounded-full blur-md transition-all duration-300 pointer-events-none`}
         style={{
+          zIndex: 0,
           top: `${sizeValue + 10}px`,
           background: `radial-gradient(ellipse, ${finalGlowColor}45 0%, transparent 75%)`,
           opacity: isRolling ? 0.8 : 0.45,
