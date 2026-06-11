@@ -1,14 +1,23 @@
 import React, { useState, useEffect } from 'react';
 import { DiceResult } from '@/types';
 import { useDiceStore } from '@/store/useDiceStore';
-import { Save, Plus, X } from 'lucide-react';
+import { Save, Plus, X, Wand2 } from 'lucide-react';
 
 interface DiceFormProps {
   result: DiceResult | null;
   onSaved: () => void;
+  initialQuestion?: string;
+  initialQuestionType?: string;
+  autoFillNotes?: string;
 }
 
-const DiceForm: React.FC<DiceFormProps> = ({ result, onSaved }) => {
+const DiceForm: React.FC<DiceFormProps> = ({
+  result,
+  onSaved,
+  initialQuestion,
+  initialQuestionType,
+  autoFillNotes,
+}) => {
   const { questionTypes, addRecord, addQuestionType } = useDiceStore();
   const [question, setQuestion] = useState('');
   const [questionType, setQuestionType] = useState('');
@@ -18,11 +27,39 @@ const DiceForm: React.FC<DiceFormProps> = ({ result, onSaved }) => {
   const [newTypeColor, setNewTypeColor] = useState('#8b5cf6');
 
   useEffect(() => {
+    if (initialQuestion !== undefined) {
+      setQuestion(initialQuestion);
+    }
+  }, [initialQuestion]);
+
+  useEffect(() => {
+    if (initialQuestionType !== undefined) {
+      setQuestionType(initialQuestionType);
+    }
+  }, [initialQuestionType]);
+
+  useEffect(() => {
+    if (autoFillNotes !== undefined && autoFillNotes !== '') {
+      setNotes(autoFillNotes);
+    }
+  }, [autoFillNotes]);
+
+  useEffect(() => {
     if (result) {
-      setQuestion('');
-      setNotes('');
+      if (initialQuestion === undefined) {
+        setQuestion('');
+      }
+      if (autoFillNotes === undefined) {
+        setNotes('');
+      }
     }
   }, [result]);
+
+  const handleFillInterpretation = () => {
+    if (autoFillNotes) {
+      setNotes(autoFillNotes);
+    }
+  };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -151,9 +188,21 @@ const DiceForm: React.FC<DiceFormProps> = ({ result, onSaved }) => {
       </div>
 
       <div>
-        <label className="block text-sm font-medium text-indigo-200 mb-2">
-          解读笔记
-        </label>
+        <div className="flex items-center justify-between mb-2">
+          <label className="block text-sm font-medium text-indigo-200">
+            解读笔记
+          </label>
+          {autoFillNotes && notes !== autoFillNotes && (
+            <button
+              type="button"
+              onClick={handleFillInterpretation}
+              className="flex items-center gap-1 px-2 py-1 rounded-lg text-xs text-violet-300 bg-violet-500/15 border border-violet-500/25 hover:bg-violet-500/25 transition-all"
+            >
+              <Wand2 size={12} />
+              填充解析
+            </button>
+          )}
+        </div>
         <textarea
           value={notes}
           onChange={(e) => setNotes(e.target.value)}

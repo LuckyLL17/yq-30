@@ -1,17 +1,22 @@
-import React, { useState, useCallback, useRef, useEffect } from 'react';
+import React, { useState, useCallback, useRef, useEffect, useMemo } from 'react';
 import { useDiceStore } from '@/store/useDiceStore';
 import DiceDisplay from '@/components/DiceDisplay';
 import DiceForm from '@/components/DiceForm';
 import DivinationInterpretation from '@/components/DivinationInterpretation';
-import { Sparkles, Check, Palette, ChevronDown, ChevronUp } from 'lucide-react';
+import QuestionTemplateSelector from '@/components/QuestionTemplateSelector';
+import { Sparkles, Check, Palette } from 'lucide-react';
 import { useSoundEffects } from '@/hooks/useSoundEffects';
 import { useNavigate } from 'react-router-dom';
+import { QuestionTemplate } from '@/utils/questionTemplates';
+import { generateDivinationInterpretation } from '@/utils/divinationData';
 
 const RollPage: React.FC = () => {
   const navigate = useNavigate();
-  const { currentResult, isRolling, rollTheDice, setRolling, getCurrentDiceSet } = useDiceStore();
+  const { currentResult, isRolling, rollTheDice, setRolling, getCurrentDiceSet, questionTypes } = useDiceStore();
   const [showSuccess, setShowSuccess] = useState(false);
   const [showInterpretation, setShowInterpretation] = useState(false);
+  const [selectedTemplate, setSelectedTemplate] = useState<QuestionTemplate | null>(null);
+  const [autoFillNotes, setAutoFillNotes] = useState<string>('');
   const { playRollSound, playStopSound } = useSoundEffects();
   const rollTimerRef = useRef<NodeJS.Timeout[]>([]);
 
@@ -49,8 +54,34 @@ const RollPage: React.FC = () => {
     rollTimerRef.current.push(t2);
   }, [isRolling, rollTheDice, setRolling, getCurrentDiceSet, playRollSound, playStopSound]);
 
+  useEffect(() => {
+    if (currentResult && showInterpretation && !isRolling) {
+      const interpretation = generateDivinationInterpretation(currentResult);
+      const notesText = [
+        `【综合解读】${interpretation.overall}`,
+        '',
+        `【行星落星座】${interpretation.planetInSign}`,
+        '',
+        `【行星落宫位】${interpretation.planetInHouse}`,
+        '',
+        `【星座落宫位】${interpretation.signInHouse}`,
+        '',
+        `【关键主题】${interpretation.keyThemes.join('、')}`,
+        '',
+        `【占卜建议】${interpretation.advice}`,
+      ].join('\n');
+      setAutoFillNotes(notesText);
+    }
+  }, [currentResult, showInterpretation, isRolling]);
+
+  const handleSelectTemplate = useCallback((template: QuestionTemplate) => {
+    setSelectedTemplate(template);
+  }, []);
+
   const handleSaved = useCallback(() => {
     setShowSuccess(true);
+    setSelectedTemplate(null);
+    setAutoFillNotes('');
     setTimeout(() => setShowSuccess(false), 2000);
   }, []);
 
@@ -88,6 +119,24 @@ const RollPage: React.FC = () => {
             静心凝神，专注于你的问题，然后点击投掷按钮。骰子将揭示行星、星座和宫位的组合，为你指引方向。
           </p>
         </div>
+
+        <div className="max-w-2xl mx-auto mb-8">
+          <QuestionTemplateSelector
+            questionTypes={questionTypes}
+            selectedTemplateId={selectedTemplate?.id || null}
+            onSelectTemplate={handleSelectTemplate}
+          />
+        </div>
+
+        {selectedTemplate && (
+          <div className="max-w-2xl mx-auto mb-8 p-4 rounded-2xl backdrop-blur-md bg-violet-500/10 border border-violet-500/20">
+            <div className="flex items-center gap-2">
+              <Sparkles size={16} className="text-violet-300" />
+              <span className="text-sm text-violet-200">当前问题：</span>
+              <span className="text-sm text-white font-medium">{selectedTemplate.question}</span>
+            </div>
+          </div>
+        )}
 
         <div className="mb-10">
           <DiceDisplay result={currentResult} isRolling={isRolling} />
@@ -136,7 +185,13 @@ const RollPage: React.FC = () => {
               <span className="w-2 h-2 rounded-full bg-amber-400 animate-pulse" />
               记录本次结果
             </h3>
-            <DiceForm result={currentResult} onSaved={handleSaved} />
+            <DiceForm
+              result={currentResult}
+              onSaved={handleSaved}
+              initialQuestion={selectedTemplate?.question}
+              initialQuestionType={selectedTemplate?.categoryId}
+              autoFillNotes={autoFillNotes}
+            />
           </div>
         )}
 
