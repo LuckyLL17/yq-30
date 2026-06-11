@@ -2,7 +2,7 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useDiceStore } from '@/store/useDiceStore';
 import { DiceSet, DiceVisualStyle } from '@/types';
-import { ANIMATION_PRESETS, SOUND_EFFECTS, COLOR_PALETTES, createDefaultDiceSet } from '@/utils/diceSetPresets';
+import { ANIMATION_PRESETS, SOUND_EFFECTS, COLOR_PALETTES, createDefaultDiceSet, DEFAULT_DICE_SETS } from '@/utils/diceSetPresets';
 import Dice3D from '@/components/Dice3D';
 import { ArrowLeft, Save, RotateCcw, Volume2, Sparkles, Palette, Sun, Shuffle } from 'lucide-react';
 import { useSoundEffects } from '@/hooks/useSoundEffects';
@@ -162,8 +162,7 @@ const DiceSetEditPage: React.FC = () => {
 
   const applyPreset = (presetId: string) => {
     const presets: Record<string, DiceSet> = {};
-    const allPresets = require('@/utils/diceSetPresets').DEFAULT_DICE_SETS;
-    allPresets.forEach((p: DiceSet) => { presets[p.id] = p; });
+    DEFAULT_DICE_SETS.forEach((p: DiceSet) => { presets[p.id] = p; });
     if (presets[presetId]) {
       const p = presets[presetId];
       setPlanetStyle({ ...p.planetStyle });
@@ -355,7 +354,7 @@ const DiceSetEditPage: React.FC = () => {
                 应用预设主题
               </h4>
               <div className="space-y-2 mb-6">
-                {require('@/utils/diceSetPresets').DEFAULT_DICE_SETS.map((preset: DiceSet) => (
+                {DEFAULT_DICE_SETS.map((preset: DiceSet) => (
                   <button
                     key={preset.id}
                     onClick={() => applyPreset(preset.id)}

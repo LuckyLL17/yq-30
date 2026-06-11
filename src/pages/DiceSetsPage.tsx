@@ -5,6 +5,7 @@ import { DiceSet } from '@/types';
 import Dice3D from '@/components/Dice3D';
 import { Palette, Plus, Check, Edit2, Trash2, Volume2, Sparkles, GripVertical } from 'lucide-react';
 import { useSoundEffects } from '@/hooks/useSoundEffects';
+import { createDefaultDiceSet } from '@/utils/diceSetPresets';
 
 const DiceSetCard: React.FC<{
   diceSet: DiceSet;
@@ -145,8 +146,6 @@ const DiceSetsPage: React.FC = () => {
     deleteDiceSet,
     addDiceSet,
   } = useDiceStore();
-  const { createDefaultDiceSet } = require('@/utils/diceSetPresets');
-
   const handleCreateNew = () => {
     const newSet = addDiceSet(createDefaultDiceSet());
     navigate(`/dice-sets/edit/${newSet.id}`);
