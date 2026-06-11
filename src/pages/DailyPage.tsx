@@ -1,7 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useDiceStore } from '@/store/useDiceStore';
 import { getPlanetByName, getSignByName, getHouseByNumber, formatDateShort, getTodayDateString } from '@/utils/diceData';
-import Dice3D from '@/components/Dice3D';
+import { DiceResult } from '@/types';
+import DiceDisplay from '@/components/DiceDisplay';
 import { Calendar, Flame, Trophy, Clock, Sparkles, Star, Palette, Hash, ChevronDown, ChevronUp } from 'lucide-react';
 
 const DailyPage: React.FC = () => {
@@ -130,72 +131,20 @@ const DailyPage: React.FC = () => {
                 <p className="text-indigo-300/70 text-lg">今日运势关键词</p>
               </div>
 
-              <div className="flex justify-center mb-6">
-                <div className="flex -space-x-4">
-                  {(() => {
-                    const planet = getPlanetByName(todayFortune.planet);
-                    const sign = getSignByName(todayFortune.sign);
-                    const house = getHouseByNumber(todayFortune.house);
-                    return (
-                      <>
-                        {planet && (
-                          <div className="transform hover:scale-110 transition-transform z-30">
-                            <Dice3D
-                              symbol={planet.symbol}
-                              isRolling={false}
-                              gradientFrom="#f59e0b"
-                              gradientTo="#ea580c"
-                              borderColor="#fbbf24"
-                              size="md"
-                            />
-                          </div>
-                        )}
-                        {sign && (
-                          <div className="transform hover:scale-110 transition-transform z-20">
-                            <Dice3D
-                              symbol={sign.symbol}
-                              isRolling={false}
-                              gradientFrom="#8b5cf6"
-                              gradientTo="#7c3aed"
-                              borderColor="#a78bfa"
-                              size="md"
-                            />
-                          </div>
-                        )}
-                        {house && (
-                          <div className="transform hover:scale-110 transition-transform z-10">
-                            <Dice3D
-                              symbol={house.number.toString()}
-                              isRolling={false}
-                              gradientFrom="#3b82f6"
-                              gradientTo="#0891b2"
-                              borderColor="#60a5fa"
-                              size="md"
-                            />
-                          </div>
-                        )}
-                      </>
-                    );
-                  })()}
-                </div>
+              <div className="mb-6">
+                {(() => {
+                  const planet = getPlanetByName(todayFortune.planet);
+                  const sign = getSignByName(todayFortune.sign);
+                  const house = getHouseByNumber(todayFortune.house);
+                  if (planet && sign && house) {
+                    const result: DiceResult = { planet, sign, house };
+                    return <DiceDisplay result={result} isRolling={false} />;
+                  }
+                  return null;
+                })()}
               </div>
 
-              <div className="grid grid-cols-3 gap-3 mb-6">
-                <div className="text-center p-3 rounded-xl bg-white/5">
-                  <div className="text-xs text-indigo-300/60 mb-1">行星</div>
-                  <div className="text-white font-semibold">{todayFortune.planet}</div>
-                </div>
-                <div className="text-center p-3 rounded-xl bg-white/5">
-                  <div className="text-xs text-indigo-300/60 mb-1">星座</div>
-                  <div className="text-white font-semibold">{todayFortune.sign}</div>
-                </div>
-                <div className="text-center p-3 rounded-xl bg-white/5">
-                  <div className="text-xs text-indigo-300/60 mb-1">宫位</div>
-                  <div className="text-white font-semibold">{todayFortune.house}宫</div>
-                </div>
-              </div>
-
-              <div className="p-5 rounded-2xl bg-gradient-to-r from-violet-500/10 to-amber-500/10 border border-violet-500/20">
+              <div className="p-5 rounded-2xl bg-gradient-to-r from-violet-500/10 to-amber-500/10 border border-violet-500/20 mb-6">
                 <div className="flex items-start gap-3">
                   <Sparkles className="text-amber-400 flex-shrink-0 mt-0.5" size={20} />
                   <div>
@@ -256,35 +205,8 @@ const DailyPage: React.FC = () => {
                 </p>
               </div>
 
-              <div className="flex justify-center mb-8">
-                <div className="flex -space-x-4 opacity-30">
-                  <Dice3D
-                    symbol="?"
-                    isRolling={isRevealing}
-                    gradientFrom="#f59e0b"
-                    gradientTo="#ea580c"
-                    borderColor="#fbbf24"
-                    size="lg"
-                  />
-                  <Dice3D
-                    symbol="?"
-                    isRolling={isRevealing}
-                    delay={100}
-                    gradientFrom="#8b5cf6"
-                    gradientTo="#7c3aed"
-                    borderColor="#a78bfa"
-                    size="lg"
-                  />
-                  <Dice3D
-                    symbol="?"
-                    isRolling={isRevealing}
-                    delay={200}
-                    gradientFrom="#3b82f6"
-                    gradientTo="#0891b2"
-                    borderColor="#60a5fa"
-                    size="lg"
-                  />
-                </div>
+              <div className="mb-8 opacity-60">
+                <DiceDisplay result={null} isRolling={isRevealing} />
               </div>
 
               <div className="flex justify-center">
