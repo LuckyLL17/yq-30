@@ -2,7 +2,8 @@ import React, { useState, useCallback, useRef, useEffect } from 'react';
 import { useDiceStore } from '@/store/useDiceStore';
 import DiceDisplay from '@/components/DiceDisplay';
 import DiceForm from '@/components/DiceForm';
-import { Sparkles, Check, Palette } from 'lucide-react';
+import DivinationInterpretation from '@/components/DivinationInterpretation';
+import { Sparkles, Check, Palette, ChevronDown, ChevronUp } from 'lucide-react';
 import { useSoundEffects } from '@/hooks/useSoundEffects';
 import { useNavigate } from 'react-router-dom';
 
@@ -10,6 +11,7 @@ const RollPage: React.FC = () => {
   const navigate = useNavigate();
   const { currentResult, isRolling, rollTheDice, setRolling, getCurrentDiceSet } = useDiceStore();
   const [showSuccess, setShowSuccess] = useState(false);
+  const [showInterpretation, setShowInterpretation] = useState(false);
   const { playRollSound, playStopSound } = useSoundEffects();
   const rollTimerRef = useRef<NodeJS.Timeout[]>([]);
 
@@ -42,6 +44,7 @@ const RollPage: React.FC = () => {
       rollTheDice();
       playStopSound(diceSet.stopSound);
       setRolling(false);
+      setShowInterpretation(true);
     }, animDuration);
     rollTimerRef.current.push(t2);
   }, [isRolling, rollTheDice, setRolling, getCurrentDiceSet, playRollSound, playStopSound]);
@@ -120,6 +123,12 @@ const RollPage: React.FC = () => {
             <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000" />
           </button>
         </div>
+
+        {currentResult && showInterpretation && !isRolling && (
+          <div className="max-w-2xl mx-auto mb-8">
+            <DivinationInterpretation result={currentResult} />
+          </div>
+        )}
 
         {currentResult && (
           <div className="max-w-2xl mx-auto p-6 rounded-3xl backdrop-blur-md bg-white/5 border border-white/10">

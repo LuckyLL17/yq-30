@@ -1,10 +1,11 @@
-import React, { useState } from 'react';
-import { DiceRecord } from '@/types';
+import React, { useState, useMemo } from 'react';
+import { DiceRecord, DiceResult } from '@/types';
 import { useDiceStore } from '@/store/useDiceStore';
 import { formatDate, getPlanetByName, getSignByName, getHouseByNumber } from '@/utils/diceData';
+import { generateDivinationInterpretation } from '@/utils/divinationData';
 import TypeTag from './TypeTag';
 import Dice3D from './Dice3D';
-import { Trash2, ChevronDown, ChevronUp } from 'lucide-react';
+import { Trash2, ChevronDown, ChevronUp, Sparkles } from 'lucide-react';
 
 interface RecordCardProps {
   record: DiceRecord;
@@ -35,6 +36,14 @@ const RecordCard: React.FC<RecordCardProps> = ({ record }) => {
   const planet = getPlanetByName(record.planet);
   const sign = getSignByName(record.sign);
   const house = getHouseByNumber(record.house);
+
+  const interpretation = useMemo(() => {
+    if (planet && sign && house) {
+      const result: DiceResult = { planet, sign, house };
+      return generateDivinationInterpretation(result);
+    }
+    return null;
+  }, [planet, sign, house]);
 
   const handleDelete = (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -114,11 +123,39 @@ const RecordCard: React.FC<RecordCardProps> = ({ record }) => {
       </div>
 
       {expanded && record.notes && (
-        <div className="pt-4 border-t border-white/10">
+        <div className="pt-4 border-t border-white/10 mb-4">
           <div className="text-xs text-indigo-300/60 mb-2">解读笔记</div>
           <p className="text-indigo-200/80 text-sm leading-relaxed whitespace-pre-wrap">
             {record.notes}
           </p>
+        </div>
+      )}
+
+      {expanded && interpretation && (
+        <div className={`${record.notes ? '' : 'pt-4 border-t border-white/10'}`}>
+          <div className="flex items-center gap-2 mb-3">
+            <Sparkles size={14} className="text-amber-400" />
+            <span className="text-xs text-indigo-300/60">占卜解析</span>
+          </div>
+          <p className="text-indigo-200/80 text-sm leading-relaxed mb-3">
+            {interpretation.overall}
+          </p>
+          <div className="flex flex-wrap gap-1.5 mb-3">
+            {interpretation.keyThemes.map((theme, index) => (
+              <span
+                key={index}
+                className="px-2 py-0.5 rounded-full text-xs bg-violet-500/20 text-violet-300 border border-violet-500/30"
+              >
+                {theme}
+              </span>
+            ))}
+          </div>
+          <div className="p-3 rounded-xl bg-gradient-to-r from-amber-500/10 to-violet-500/10 border border-amber-500/20">
+            <p className="text-indigo-200/80 text-xs leading-relaxed">
+              <span className="text-amber-400 font-medium">建议：</span>
+              {interpretation.advice}
+            </p>
+          </div>
         </div>
       )}
 
