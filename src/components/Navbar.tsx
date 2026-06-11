@@ -1,6 +1,6 @@
 import React from 'react';
 import { NavLink, useLocation } from 'react-router-dom';
-import { Sparkles, BookOpen, BarChart3, Calendar } from 'lucide-react';
+import { Sparkles, BookOpen, BarChart3, Calendar, Palette } from 'lucide-react';
 
 const Navbar: React.FC = () => {
   const location = useLocation();
@@ -8,6 +8,7 @@ const Navbar: React.FC = () => {
   const navItems = [
     { path: '/', label: '投掷骰子', icon: Sparkles },
     { path: '/daily', label: '每日一骰', icon: Calendar },
+    { path: '/dice-sets', label: '骰子套装', icon: Palette },
     { path: '/records', label: '历史记录', icon: BookOpen },
     { path: '/analytics', label: '统计分析', icon: BarChart3 },
   ];

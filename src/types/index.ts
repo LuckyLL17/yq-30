@@ -115,3 +115,47 @@ export interface DailyCheckInStats {
   totalCheckIns: number;
   lastCheckInDate: string | null;
 }
+
+export interface DiceVisualStyle {
+  gradientFrom: string;
+  gradientTo: string;
+  borderColor: string;
+  glowColor: string;
+  symbolColor: string;
+}
+
+export interface DiceAnimationPreset {
+  id: string;
+  name: string;
+  animationName: string;
+  duration: number;
+  easing: string;
+  description: string;
+}
+
+export interface SoundEffect {
+  id: string;
+  name: string;
+  type: 'sine' | 'square' | 'sawtooth' | 'triangle';
+  frequencyStart: number;
+  frequencyEnd: number;
+  duration: number;
+  volume: number;
+  description: string;
+}
+
+export interface DiceSet {
+  id: string;
+  name: string;
+  description: string;
+  createdAt: string;
+  updatedAt: string;
+  isDefault: boolean;
+  planetStyle: DiceVisualStyle;
+  signStyle: DiceVisualStyle;
+  houseStyle: DiceVisualStyle;
+  animationPreset: DiceAnimationPreset;
+  rollSound: SoundEffect;
+  stopSound: SoundEffect;
+  size: 'sm' | 'md' | 'lg';
+}

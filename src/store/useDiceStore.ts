@@ -1,7 +1,8 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import { DiceRecord, QuestionType, DiceResult, DailyFortune, DailyCheckInStats } from '@/types';
+import { DiceRecord, QuestionType, DiceResult, DailyFortune, DailyCheckInStats, DiceSet } from '@/types';
 import { DEFAULT_QUESTION_TYPES, generateId, rollDice, generateDailyFortune, getTodayDateString, isTodayCheckedIn, calculateStreak } from '@/utils/diceData';
+import { DEFAULT_DICE_SETS } from '@/utils/diceSetPresets';
 
 interface DiceState {
   records: DiceRecord[];
@@ -9,6 +10,8 @@ interface DiceState {
   currentResult: DiceResult | null;
   isRolling: boolean;
   dailyFortunes: DailyFortune[];
+  diceSets: DiceSet[];
+  currentDiceSetId: string | null;
   addRecord: (data: Omit<DiceRecord, 'id' | 'timestamp'>) => void;
   deleteRecord: (id: string) => void;
   clearAllRecords: () => void;
@@ -23,6 +26,11 @@ interface DiceState {
   getDailyCheckInStats: () => DailyCheckInStats;
   getFortuneByDate: (date: string) => DailyFortune | null;
   isTodayCheckedIn: () => boolean;
+  getCurrentDiceSet: () => DiceSet;
+  addDiceSet: (diceSet: Omit<DiceSet, 'id' | 'createdAt' | 'updatedAt' | 'isDefault'>) => DiceSet;
+  updateDiceSet: (id: string, updates: Partial<DiceSet>) => void;
+  deleteDiceSet: (id: string) => void;
+  setCurrentDiceSet: (id: string) => void;
 }
 
 export const useDiceStore = create<DiceState>()(
@@ -33,6 +41,8 @@ export const useDiceStore = create<DiceState>()(
       currentResult: null,
       isRolling: false,
       dailyFortunes: [],
+      diceSets: DEFAULT_DICE_SETS,
+      currentDiceSetId: 'set-classic',
 
       rollTheDice: () => {
         const result = rollDice();
@@ -132,6 +142,55 @@ export const useDiceStore = create<DiceState>()(
 
       isTodayCheckedIn: () => {
         return isTodayCheckedIn(get().dailyFortunes);
+      },
+
+      getCurrentDiceSet: () => {
+        const state = get();
+        const current = state.diceSets.find((d) => d.id === state.currentDiceSetId);
+        if (current) return current;
+        return state.diceSets.find((d) => d.isDefault) || state.diceSets[0] || DEFAULT_DICE_SETS[0];
+      },
+
+      addDiceSet: (diceSet) => {
+        const now = new Date().toISOString();
+        const newSet: DiceSet = {
+          ...diceSet,
+          id: generateId(),
+          createdAt: now,
+          updatedAt: now,
+          isDefault: false,
+        };
+        set((state) => ({
+          diceSets: [...state.diceSets, newSet],
+        }));
+        return newSet;
+      },
+
+      updateDiceSet: (id, updates) => {
+        set((state) => ({
+          diceSets: state.diceSets.map((d) =>
+            d.id === id ? { ...d, ...updates, updatedAt: new Date().toISOString() } : d
+          ),
+        }));
+      },
+
+      deleteDiceSet: (id) => {
+        const target = get().diceSets.find((d) => d.id === id);
+        if (target && target.isDefault) return;
+        set((state) => {
+          const newSets = state.diceSets.filter((d) => d.id !== id);
+          const newCurrentId = state.currentDiceSetId === id
+            ? (newSets.find((d) => d.isDefault)?.id || newSets[0]?.id || 'set-classic')
+            : state.currentDiceSetId;
+          return {
+            diceSets: newSets,
+            currentDiceSetId: newCurrentId,
+          };
+        });
+      },
+
+      setCurrentDiceSet: (id) => {
+        set({ currentDiceSetId: id });
       },
     }),
     {

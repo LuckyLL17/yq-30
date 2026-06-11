@@ -1,9 +1,10 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { useDiceStore } from '@/store/useDiceStore';
 import { getPlanetByName, getSignByName, getHouseByNumber, formatDateShort, getTodayDateString } from '@/utils/diceData';
 import { DiceResult } from '@/types';
 import DiceDisplay from '@/components/DiceDisplay';
 import { Calendar, Flame, Trophy, Clock, Sparkles, Star, Palette, Hash, ChevronDown, ChevronUp } from 'lucide-react';
+import { useSoundEffects } from '@/hooks/useSoundEffects';
 
 const DailyPage: React.FC = () => {
   const {
@@ -16,7 +17,19 @@ const DailyPage: React.FC = () => {
     setRolling,
     rollTheDice,
     currentResult,
+    getCurrentDiceSet,
   } = useDiceStore();
+  const { playRollSound, playStopSound } = useSoundEffects();
+  const rollTimerRef = useRef<NodeJS.Timeout[]>([]);
+
+  const clearTimers = () => {
+    rollTimerRef.current.forEach((t) => clearTimeout(t));
+    rollTimerRef.current = [];
+  };
+
+  useEffect(() => {
+    return () => clearTimers();
+  }, []);
 
   const [showAnimation, setShowAnimation] = useState(false);
   const [isRevealing, setIsRevealing] = useState(false);
@@ -29,21 +42,29 @@ const DailyPage: React.FC = () => {
 
   const handleCheckIn = () => {
     if (todayChecked || isRolling) return;
+    clearTimers();
+
+    const diceSet = getCurrentDiceSet();
+    const animDuration = diceSet.animationPreset.duration;
 
     setIsRevealing(true);
     setRolling(true);
     rollTheDice();
+    playRollSound(diceSet.rollSound);
 
-    setTimeout(() => {
+    const t1 = setTimeout(() => {
       rollTheDice();
-    }, 500);
+    }, animDuration * 0.35);
+    rollTimerRef.current.push(t1);
 
-    setTimeout(() => {
+    const t2 = setTimeout(() => {
       rollTheDice();
-    }, 1000);
+    }, animDuration * 0.7);
+    rollTimerRef.current.push(t2);
 
-    setTimeout(() => {
+    const t3 = setTimeout(() => {
       const fortune = checkInToday();
+      playStopSound(diceSet.stopSound);
       setRolling(false);
       setIsRevealing(false);
       setRevealComplete(true);
@@ -51,7 +72,8 @@ const DailyPage: React.FC = () => {
         setShowAnimation(true);
         setTimeout(() => setShowAnimation(false), 2000);
       }
-    }, 1500);
+    }, animDuration);
+    rollTimerRef.current.push(t3);
   };
 
   const toggleExpand = (date: string) => {

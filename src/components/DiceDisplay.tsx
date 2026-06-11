@@ -1,6 +1,7 @@
 import React from 'react';
-import { DiceResult, Planet, Sign, House } from '@/types';
+import { DiceResult, Planet, Sign, House, DiceSet } from '@/types';
 import { PLANETS, SIGNS, HOUSES } from '@/utils/diceData';
+import { useDiceStore } from '@/store/useDiceStore';
 import Dice3D from './Dice3D';
 
 interface DiceCardProps {
@@ -11,9 +12,8 @@ interface DiceCardProps {
   extra?: string;
   isRolling: boolean;
   delay: number;
-  gradientFrom: string;
-  gradientTo: string;
-  borderColor: string;
+  diceSet: DiceSet;
+  diceType: 'planet' | 'sign' | 'house';
   allSymbols: string[];
 }
 
@@ -25,11 +25,18 @@ const DiceCard: React.FC<DiceCardProps> = ({
   extra,
   isRolling,
   delay,
-  gradientFrom,
-  gradientTo,
-  borderColor,
+  diceSet,
+  diceType,
   allSymbols,
 }) => {
+  const style = diceType === 'planet'
+    ? diceSet.planetStyle
+    : diceType === 'sign'
+      ? diceSet.signStyle
+      : diceSet.houseStyle;
+
+  const { animationPreset } = diceSet;
+
   return (
     <div
       className={`
@@ -38,8 +45,14 @@ const DiceCard: React.FC<DiceCardProps> = ({
         transition-all duration-700 ease-out
         hover:bg-white/10 hover:border-violet-500/30 hover:shadow-xl hover:shadow-violet-500/10
       `}
+      style={{
+        boxShadow: isRolling ? `0 0 40px ${style.glowColor}30` : undefined,
+      }}
     >
-      <div className="text-xs text-indigo-300/70 uppercase tracking-widest mb-4">
+      <div
+        className="text-xs uppercase tracking-widest mb-4"
+        style={{ color: `${style.glowColor}cc` }}
+      >
         {title}
       </div>
 
@@ -48,47 +61,82 @@ const DiceCard: React.FC<DiceCardProps> = ({
           symbol={symbol}
           isRolling={isRolling}
           delay={delay}
-          gradientFrom={gradientFrom}
-          gradientTo={gradientTo}
-          borderColor={borderColor}
-          size="lg"
+          gradientFrom={style.gradientFrom}
+          gradientTo={style.gradientTo}
+          borderColor={style.borderColor}
+          glowColor={style.glowColor}
+          symbolColor={style.symbolColor}
+          size={diceSet.size}
           allSymbols={allSymbols}
+          animationName={animationPreset.animationName}
+          animationDuration={animationPreset.duration}
+          animationEasing={animationPreset.easing}
         />
       </div>
 
       <div className="text-xl font-bold text-white mb-1">{name}</div>
 
       {extra && (
-        <div className="text-sm text-amber-300/80 mb-2">{extra}</div>
+        <div className="text-sm mb-2" style={{ color: `${style.glowColor}cc` }}>
+          {extra}
+        </div>
       )}
 
       <div className="text-xs text-indigo-300/60 text-center leading-relaxed">
         {meaning}
       </div>
 
-      <div className="absolute inset-0 rounded-2xl bg-gradient-to-t from-violet-500/10 to-transparent pointer-events-none" />
+      <div
+        className="absolute inset-0 rounded-2xl pointer-events-none"
+        style={{
+          background: `linear-gradient(to top, ${style.glowColor}10 0%, transparent 100%)`,
+        }}
+      />
     </div>
   );
 };
 
-const EmptyDiceCard: React.FC<{ title: string }> = ({ title }) => {
+const EmptyDiceCard: React.FC<{
+  title: string;
+  diceSet: DiceSet;
+  diceType: 'planet' | 'sign' | 'house';
+}> = ({ title, diceSet, diceType }) => {
+  const style = diceType === 'planet'
+    ? diceSet.planetStyle
+    : diceType === 'sign'
+      ? diceSet.signStyle
+      : diceSet.houseStyle;
+
+  const sizeClasses = {
+    sm: 'w-16 h-16 text-3xl',
+    md: 'w-20 h-20 text-4xl',
+    lg: 'w-24 h-24 text-5xl',
+  };
+
   return (
     <div className="flex flex-col items-center p-6 rounded-2xl backdrop-blur-md bg-white/5 border border-white/10">
-      <div className="text-xs text-indigo-300/70 uppercase tracking-widest mb-4">
+      <div
+        className="text-xs uppercase tracking-widest mb-4"
+        style={{ color: `${style.glowColor}99` }}
+      >
         {title}
       </div>
       <div className="mb-6 h-28 flex items-center justify-center">
         <div
-          className="w-24 h-24 rounded-2xl flex items-center justify-center border-2 border-indigo-500/30"
+          className={`${sizeClasses[diceSet.size]} rounded-2xl flex items-center justify-center border-2 font-bold`}
           style={{
-            background: 'linear-gradient(135deg, rgba(99, 102, 241, 0.2) 0%, rgba(139, 92, 246, 0.2) 100%)',
-            boxShadow: 'inset 0 0 30px rgba(99, 102, 241, 0.1)',
+            background: `linear-gradient(135deg, ${style.gradientFrom}20 0%, ${style.gradientTo}25 100%)`,
+            borderColor: `${style.borderColor}40`,
+            color: `${style.symbolColor}40`,
+            boxShadow: `inset 0 0 30px ${style.glowColor}10`,
           }}
         >
-          <span className="text-4xl text-indigo-400/50 font-bold">?</span>
+          ?
         </div>
       </div>
-      <div className="text-indigo-300/50 text-sm">点击下方按钮投掷</div>
+      <div style={{ color: `${style.glowColor}60` }} className="text-sm">
+        点击下方按钮投掷
+      </div>
     </div>
   );
 };
@@ -103,12 +151,15 @@ const signSymbols = SIGNS.map(s => s.symbol);
 const houseNumbers = HOUSES.map(h => h.number.toString());
 
 const DiceDisplay: React.FC<DiceDisplayProps> = ({ result, isRolling }) => {
+  const getCurrentDiceSet = useDiceStore((s) => s.getCurrentDiceSet);
+  const diceSet = getCurrentDiceSet();
+
   if (!result) {
     return (
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <EmptyDiceCard title="行星" />
-        <EmptyDiceCard title="星座" />
-        <EmptyDiceCard title="宫位" />
+        <EmptyDiceCard title="行星" diceSet={diceSet} diceType="planet" />
+        <EmptyDiceCard title="星座" diceSet={diceSet} diceType="sign" />
+        <EmptyDiceCard title="宫位" diceSet={diceSet} diceType="house" />
       </div>
     );
   }
@@ -124,9 +175,8 @@ const DiceDisplay: React.FC<DiceDisplayProps> = ({ result, isRolling }) => {
         meaning={planet.meaning}
         isRolling={isRolling}
         delay={0}
-        gradientFrom="#f59e0b"
-        gradientTo="#ea580c"
-        borderColor="#fbbf24"
+        diceSet={diceSet}
+        diceType="planet"
         allSymbols={planetSymbols}
       />
       <DiceCard
@@ -137,9 +187,8 @@ const DiceDisplay: React.FC<DiceDisplayProps> = ({ result, isRolling }) => {
         extra={`${sign.element}象 · ${sign.modality}星座`}
         isRolling={isRolling}
         delay={150}
-        gradientFrom="#8b5cf6"
-        gradientTo="#7c3aed"
-        borderColor="#a78bfa"
+        diceSet={diceSet}
+        diceType="sign"
         allSymbols={signSymbols}
       />
       <DiceCard
@@ -149,9 +198,8 @@ const DiceDisplay: React.FC<DiceDisplayProps> = ({ result, isRolling }) => {
         meaning={house.meaning}
         isRolling={isRolling}
         delay={300}
-        gradientFrom="#3b82f6"
-        gradientTo="#0891b2"
-        borderColor="#60a5fa"
+        diceSet={diceSet}
+        diceType="house"
         allSymbols={houseNumbers}
       />
     </div>

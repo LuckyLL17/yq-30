@@ -5,6 +5,8 @@ import RollPage from '@/pages/RollPage';
 import RecordsPage from '@/pages/RecordsPage';
 import AnalyticsPage from '@/pages/AnalyticsPage';
 import DailyPage from '@/pages/DailyPage';
+import DiceSetsPage from '@/pages/DiceSetsPage';
+import DiceSetEditPage from '@/pages/DiceSetEditPage';
 
 export default function App() {
   return (
@@ -15,6 +17,8 @@ export default function App() {
         <Routes>
           <Route path="/" element={<RollPage />} />
           <Route path="/daily" element={<DailyPage />} />
+          <Route path="/dice-sets" element={<DiceSetsPage />} />
+          <Route path="/dice-sets/edit/:id" element={<DiceSetEditPage />} />
           <Route path="/records" element={<RecordsPage />} />
           <Route path="/analytics" element={<AnalyticsPage />} />
         </Routes>
