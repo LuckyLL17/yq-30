@@ -12,25 +12,45 @@ const DailyPage: React.FC = () => {
     isTodayCheckedIn,
     getDailyCheckInStats,
     getTodayFortune,
+    isRolling,
+    setRolling,
+    rollTheDice,
+    currentResult,
   } = useDiceStore();
 
   const [showAnimation, setShowAnimation] = useState(false);
   const [isRevealing, setIsRevealing] = useState(false);
   const [expandedDate, setExpandedDate] = useState<string | null>(null);
+  const [revealComplete, setRevealComplete] = useState(false);
 
   const todayChecked = isTodayCheckedIn();
   const todayFortune = getTodayFortune();
   const stats = getDailyCheckInStats();
 
   const handleCheckIn = () => {
-    if (todayChecked) return;
+    if (todayChecked || isRolling) return;
 
     setIsRevealing(true);
+    setRolling(true);
+    rollTheDice();
+
     setTimeout(() => {
-      checkInToday();
-      setShowAnimation(true);
+      rollTheDice();
+    }, 500);
+
+    setTimeout(() => {
+      rollTheDice();
+    }, 1000);
+
+    setTimeout(() => {
+      const fortune = checkInToday();
+      setRolling(false);
       setIsRevealing(false);
-      setTimeout(() => setShowAnimation(false), 2000);
+      setRevealComplete(true);
+      if (fortune) {
+        setShowAnimation(true);
+        setTimeout(() => setShowAnimation(false), 2000);
+      }
     }, 1500);
   };
 
@@ -92,7 +112,7 @@ const DailyPage: React.FC = () => {
         </div>
 
         <div className="mb-8">
-          {todayFortune ? (
+          {todayFortune && !isRevealing ? (
             <div className="relative p-8 rounded-3xl backdrop-blur-md bg-white/5 border border-white/10 overflow-hidden">
               {showAnimation && (
                 <div className="absolute inset-0 pointer-events-none">
@@ -199,14 +219,18 @@ const DailyPage: React.FC = () => {
                     {today.toLocaleDateString('zh-CN', { year: 'numeric', month: 'long', day: 'numeric', weekday: 'long' })}
                   </span>
                 </div>
-                <h3 className="text-2xl font-bold text-white mb-3">今日运势尚未揭晓</h3>
+                <h3 className="text-2xl font-bold text-white mb-3">
+                  {isRevealing ? '运势揭晓中...' : '今日运势尚未揭晓'}
+                </h3>
                 <p className="text-indigo-300/60 max-w-md mx-auto">
-                  点击下方按钮，投掷今日的占星骰子，获取专属于你的运势关键词与建议。
+                  {isRevealing
+                    ? '骰子正在旋转，为你揭示今日运势...'
+                    : '点击下方按钮，投掷今日的占星骰子，获取专属于你的运势关键词与建议。'}
                 </p>
               </div>
 
-              <div className="mb-8 opacity-60">
-                <DiceDisplay result={null} isRolling={isRevealing} />
+              <div className="mb-8">
+                <DiceDisplay result={isRevealing ? currentResult : null} isRolling={isRolling} />
               </div>
 
               <div className="flex justify-center">
