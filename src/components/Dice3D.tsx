@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useMemo } from 'react';
 
 interface Dice3DProps {
   symbol: string;
@@ -21,16 +21,7 @@ const Dice3D: React.FC<Dice3DProps> = ({
   size = 'lg',
   allSymbols,
 }) => {
-  const [displaySymbol, setDisplaySymbol] = useState(symbol);
-  const [faces, setFaces] = useState<string[]>([]);
-
   const sizeClasses = {
-    sm: 'w-16 h-16',
-    md: 'w-20 h-20',
-    lg: 'w-24 h-24',
-  };
-
-  const faceSize = {
     sm: 'w-16 h-16',
     md: 'w-20 h-20',
     lg: 'w-24 h-24',
@@ -48,46 +39,32 @@ const Dice3D: React.FC<Dice3DProps> = ({
       return shuffled.slice(0, 6);
     }
     return [symbol, symbol, symbol, symbol, symbol, symbol];
-  }, [allSymbols, symbol]);
+  }, [allSymbols, symbol, isRolling]);
 
-  useEffect(() => {
-    if (!isRolling) {
-      setDisplaySymbol(symbol);
-      setFaces([symbol, symbol, symbol, symbol, symbol, symbol]);
-    } else {
-      setFaces(faceSymbols);
-      const interval = setInterval(() => {
-        if (allSymbols) {
-          setDisplaySymbol(allSymbols[Math.floor(Math.random() * allSymbols.length)]);
-        }
-      }, 80);
-
-      return () => clearInterval(interval);
-    }
-  }, [isRolling, symbol, allSymbols, faceSymbols]);
-
-  const faceStyles = (index: number) => {
-    const transforms = [
-      'rotateY(0deg) translateZ(var(--half-size))',
-      'rotateY(90deg) translateZ(var(--half-size))',
-      'rotateY(180deg) translateZ(var(--half-size))',
-      'rotateY(-90deg) translateZ(var(--half-size))',
-      'rotateX(90deg) translateZ(var(--half-size))',
-      'rotateX(-90deg) translateZ(var(--half-size))',
-    ];
-
-    return {
-      transform: transforms[index],
-    };
-  };
+  const faceTransforms = [
+    'rotateY(0deg) translateZ(var(--half-size))',
+    'rotateY(90deg) translateZ(var(--half-size))',
+    'rotateY(180deg) translateZ(var(--half-size))',
+    'rotateY(-90deg) translateZ(var(--half-size))',
+    'rotateX(90deg) translateZ(var(--half-size))',
+    'rotateX(-90deg) translateZ(var(--half-size))',
+  ];
 
   const sizeValue = size === 'sm' ? 64 : size === 'md' ? 80 : 96;
   const halfSize = sizeValue / 2;
 
+  const displayFaces = isRolling ? faceSymbols : [symbol, symbol, symbol, symbol, symbol, symbol];
+
   return (
-    <div className="relative" style={{ perspective: '800px' }}>
+    <div 
+      className="relative" 
+      style={{ 
+        perspective: '1000px',
+        perspectiveOrigin: '50% 50%',
+      }}
+    >
       <div
-        className={`${sizeClasses[size]} relative transition-transform duration-500`}
+        className={`${sizeClasses[size]} relative`}
         style={{
           transformStyle: 'preserve-3d',
           '--half-size': `${halfSize}px`,
@@ -95,45 +72,47 @@ const Dice3D: React.FC<Dice3DProps> = ({
       >
         <div
           className={`
-            absolute inset-0 transform-gpu
+            absolute inset-0
             ${isRolling ? 'animate-dice-3d-roll' : ''}
           `}
           style={{
             transformStyle: 'preserve-3d',
             animationDelay: `${delay}ms`,
+            willChange: 'transform',
           }}
         >
-          {[0, 1, 2, 3, 4, 5].map((index) => (
+          {displayFaces.map((faceSymbol, index) => (
             <div
               key={index}
               className={`
-                absolute ${faceSize[size]} rounded-2xl flex items-center justify-center
-                border-2 shadow-xl
+                absolute ${sizeClasses[size]} rounded-2xl flex items-center justify-center
+                border-2
               `}
               style={{
-                ...faceStyles(index),
-                background: `linear-gradient(135deg, ${gradientFrom}40 0%, ${gradientTo}40 100%)`,
-                borderColor: `${borderColor}60`,
-                boxShadow: `inset 0 0 30px ${gradientFrom}20, 0 0 20px ${gradientTo}30`,
-                backdropFilter: 'blur(10px)',
+                transform: faceTransforms[index],
+                background: `linear-gradient(135deg, ${gradientFrom}30 0%, ${gradientTo}40 100%)`,
+                borderColor: `${borderColor}50`,
+                boxShadow: `inset 0 2px 10px ${gradientFrom}15, 0 0 15px ${gradientTo}20`,
                 backfaceVisibility: 'hidden',
+                willChange: 'transform',
               }}
             >
               <span
-                className={`${symbolSizes[size]} text-white font-bold drop-shadow-lg`}
+                className={`${symbolSizes[size]} text-white font-bold select-none`}
                 style={{
-                  textShadow: `0 0 20px ${gradientTo}`,
+                  textShadow: `0 0 15px ${gradientTo}, 0 2px 4px rgba(0,0,0,0.3)`,
+                  transform: 'translateZ(1px)',
                 }}
               >
-                {isRolling ? faces[index] : displaySymbol}
+                {faceSymbol}
               </span>
 
               <div
-                className="absolute inset-0 rounded-2xl pointer-events-none"
+                className="absolute inset-0 rounded-2xl pointer-events-none overflow-hidden"
                 style={{
                   background: `
-                    radial-gradient(circle at 30% 30%, rgba(255,255,255,0.2) 0%, transparent 50%),
-                    linear-gradient(135deg, transparent 40%, rgba(255,255,255,0.1) 50%, transparent 60%)
+                    radial-gradient(ellipse at 25% 20%, rgba(255,255,255,0.25) 0%, transparent 40%),
+                    linear-gradient(180deg, rgba(255,255,255,0.08) 0%, transparent 50%)
                   `,
                 }}
               />
@@ -143,9 +122,12 @@ const Dice3D: React.FC<Dice3DProps> = ({
       </div>
 
       <div
-        className="absolute -bottom-4 left-1/2 -translate-x-1/2 w-16 h-4 rounded-full blur-md opacity-50"
+        className="absolute left-1/2 -translate-x-1/2 w-12 h-3 rounded-full blur-md transition-opacity duration-300"
         style={{
-          background: `radial-gradient(ellipse, ${gradientTo}40 0%, transparent 70%)`,
+          top: `${sizeValue + 8}px`,
+          background: `radial-gradient(ellipse, ${gradientTo}35 0%, transparent 70%)`,
+          opacity: isRolling ? 0.7 : 0.4,
+          transform: `translateX(-50%) scale(${isRolling ? 0.7 : 1})`,
         }}
       />
     </div>

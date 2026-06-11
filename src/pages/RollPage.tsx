@@ -12,12 +12,9 @@ const RollPage: React.FC = () => {
     if (isRolling) return;
 
     setRolling(true);
-    const interval = setInterval(() => {
-      rollTheDice();
-    }, 100);
+    rollTheDice();
 
     setTimeout(() => {
-      clearInterval(interval);
       rollTheDice();
       setRolling(false);
     }, 1500);
