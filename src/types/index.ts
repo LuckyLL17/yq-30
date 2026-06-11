@@ -94,3 +94,24 @@ export interface ChartDataItem {
   value: number;
   percentage: string;
 }
+
+export interface DailyFortune {
+  id: string;
+  date: string;
+  planet: string;
+  sign: string;
+  house: number;
+  keyword: string;
+  advice: string;
+  luckyIndex: number;
+  luckyColor: string;
+  luckyNumber: number;
+  timestamp: string;
+}
+
+export interface DailyCheckInStats {
+  currentStreak: number;
+  longestStreak: number;
+  totalCheckIns: number;
+  lastCheckInDate: string | null;
+}

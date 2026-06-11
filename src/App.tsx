@@ -4,6 +4,7 @@ import StarBackground from '@/components/StarBackground';
 import RollPage from '@/pages/RollPage';
 import RecordsPage from '@/pages/RecordsPage';
 import AnalyticsPage from '@/pages/AnalyticsPage';
+import DailyPage from '@/pages/DailyPage';
 
 export default function App() {
   return (
@@ -13,6 +14,7 @@ export default function App() {
         <Navbar />
         <Routes>
           <Route path="/" element={<RollPage />} />
+          <Route path="/daily" element={<DailyPage />} />
           <Route path="/records" element={<RecordsPage />} />
           <Route path="/analytics" element={<AnalyticsPage />} />
         </Routes>

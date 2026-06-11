@@ -1,13 +1,14 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import { DiceRecord, QuestionType, DiceResult } from '@/types';
-import { DEFAULT_QUESTION_TYPES, generateId, rollDice } from '@/utils/diceData';
+import { DiceRecord, QuestionType, DiceResult, DailyFortune, DailyCheckInStats } from '@/types';
+import { DEFAULT_QUESTION_TYPES, generateId, rollDice, generateDailyFortune, getTodayDateString, isTodayCheckedIn, calculateStreak } from '@/utils/diceData';
 
 interface DiceState {
   records: DiceRecord[];
   questionTypes: QuestionType[];
   currentResult: DiceResult | null;
   isRolling: boolean;
+  dailyFortunes: DailyFortune[];
   addRecord: (data: Omit<DiceRecord, 'id' | 'timestamp'>) => void;
   deleteRecord: (id: string) => void;
   clearAllRecords: () => void;
@@ -17,6 +18,11 @@ interface DiceState {
   setRolling: (rolling: boolean) => void;
   getRecordsByType: (typeId: string) => DiceRecord[];
   searchRecords: (keyword: string) => DiceRecord[];
+  checkInToday: () => DailyFortune | null;
+  getTodayFortune: () => DailyFortune | null;
+  getDailyCheckInStats: () => DailyCheckInStats;
+  getFortuneByDate: (date: string) => DailyFortune | null;
+  isTodayCheckedIn: () => boolean;
 }
 
 export const useDiceStore = create<DiceState>()(
@@ -26,6 +32,7 @@ export const useDiceStore = create<DiceState>()(
       questionTypes: DEFAULT_QUESTION_TYPES,
       currentResult: null,
       isRolling: false,
+      dailyFortunes: [],
 
       rollTheDice: () => {
         const result = rollDice();
@@ -87,6 +94,44 @@ export const useDiceStore = create<DiceState>()(
             r.planet.includes(keyword) ||
             r.sign.includes(keyword)
         );
+      },
+
+      checkInToday: () => {
+        const today = getTodayDateString();
+        const existing = get().dailyFortunes.find((f) => f.date === today);
+        if (existing) {
+          return existing;
+        }
+        const fortune = generateDailyFortune(today);
+        set((state) => ({
+          dailyFortunes: [fortune, ...state.dailyFortunes].sort((a, b) => b.date.localeCompare(a.date)),
+        }));
+        return fortune;
+      },
+
+      getTodayFortune: () => {
+        const today = getTodayDateString();
+        return get().dailyFortunes.find((f) => f.date === today) || null;
+      },
+
+      getDailyCheckInStats: (): DailyCheckInStats => {
+        const records = get().dailyFortunes;
+        const { currentStreak, longestStreak } = calculateStreak(records);
+        const lastCheckIn = records.length > 0 ? records[0].date : null;
+        return {
+          currentStreak,
+          longestStreak,
+          totalCheckIns: records.length,
+          lastCheckInDate: lastCheckIn,
+        };
+      },
+
+      getFortuneByDate: (date: string) => {
+        return get().dailyFortunes.find((f) => f.date === date) || null;
+      },
+
+      isTodayCheckedIn: () => {
+        return isTodayCheckedIn(get().dailyFortunes);
       },
     }),
     {
