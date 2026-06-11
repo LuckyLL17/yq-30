@@ -90,12 +90,15 @@ const Dice3D: React.FC<Dice3DProps> = ({
         <div
           style={{
             transformStyle: 'preserve-3d',
-            animationDelay: `${delay}ms`,
             willChange: 'transform',
             ...(isRolling
               ? {
-                  animation: `${animationName} ${animationDuration}ms ${animationEasing} forwards`,
+                  animationName,
+                  animationDuration: `${animationDuration}ms`,
+                  animationTimingFunction: animationEasing,
+                  animationFillMode: 'forwards',
                   animationDelay: `${delay}ms`,
+                  animationIterationCount: 1,
                 }
               : {}),
           }}
