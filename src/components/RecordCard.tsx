@@ -3,11 +3,30 @@ import { DiceRecord } from '@/types';
 import { useDiceStore } from '@/store/useDiceStore';
 import { formatDate, getPlanetByName, getSignByName, getHouseByNumber } from '@/utils/diceData';
 import TypeTag from './TypeTag';
+import Dice3D from './Dice3D';
 import { Trash2, ChevronDown, ChevronUp } from 'lucide-react';
 
 interface RecordCardProps {
   record: DiceRecord;
 }
+
+const MiniDice: React.FC<{
+  symbol: string;
+  gradientFrom: string;
+  gradientTo: string;
+  borderColor: string;
+}> = ({ symbol, gradientFrom, gradientTo, borderColor }) => (
+  <div className="transform hover:scale-110 transition-transform duration-300">
+    <Dice3D
+      symbol={symbol}
+      isRolling={false}
+      gradientFrom={gradientFrom}
+      gradientTo={gradientTo}
+      borderColor={borderColor}
+      size="sm"
+    />
+  </div>
+);
 
 const RecordCard: React.FC<RecordCardProps> = ({ record }) => {
   const { deleteRecord } = useDiceStore();
@@ -31,16 +50,31 @@ const RecordCard: React.FC<RecordCardProps> = ({ record }) => {
     >
       <div className="flex items-start justify-between mb-4">
         <div className="flex items-center gap-3">
-          <div className="flex -space-x-2">
-            <div className="w-10 h-10 rounded-full bg-gradient-to-br from-amber-500/30 to-orange-600/30 border border-amber-400/30 flex items-center justify-center text-lg">
-              {planet?.symbol}
-            </div>
-            <div className="w-10 h-10 rounded-full bg-gradient-to-br from-violet-500/30 to-purple-600/30 border border-violet-400/30 flex items-center justify-center text-lg">
-              {sign?.symbol}
-            </div>
-            <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500/30 to-cyan-600/30 border border-blue-400/30 flex items-center justify-center text-lg font-bold">
-              {house?.number}
-            </div>
+          <div className="flex -space-x-3">
+            {planet && (
+              <MiniDice
+                symbol={planet.symbol}
+                gradientFrom="#f59e0b"
+                gradientTo="#ea580c"
+                borderColor="#fbbf24"
+              />
+            )}
+            {sign && (
+              <MiniDice
+                symbol={sign.symbol}
+                gradientFrom="#8b5cf6"
+                gradientTo="#7c3aed"
+                borderColor="#a78bfa"
+              />
+            )}
+            {house && (
+              <MiniDice
+                symbol={house.number.toString()}
+                gradientFrom="#3b82f6"
+                gradientTo="#0891b2"
+                borderColor="#60a5fa"
+              />
+            )}
           </div>
           <div>
             <div className="text-white font-medium line-clamp-1">
