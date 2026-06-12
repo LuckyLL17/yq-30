@@ -270,6 +270,45 @@ export interface Collection {
 
 export type CollectionSortBy = 'custom' | 'time-desc' | 'time-asc' | 'planet' | 'sign' | 'house';
 
+export type RollForce = 'gentle' | 'normal' | 'strong' | 'fierce';
+
+export const ROLL_FORCE_CONFIG: Record<RollForce, {
+  label: string;
+  description: string;
+  icon: string;
+  durationMultiplier: number;
+  intensity: number;
+}> = {
+  gentle: {
+    label: '轻柔',
+    description: '如羽毛般轻柔落下，适合内心细腻的问题',
+    icon: '🌸',
+    durationMultiplier: 1.5,
+    intensity: 0.5,
+  },
+  normal: {
+    label: '标准',
+    description: '自然平衡的投掷方式，适合日常占卜',
+    icon: '✨',
+    durationMultiplier: 1,
+    intensity: 1,
+  },
+  strong: {
+    label: '强劲',
+    description: '充满力量的投掷，适合需要决断的问题',
+    icon: '💫',
+    durationMultiplier: 0.7,
+    intensity: 1.5,
+  },
+  fierce: {
+    label: '激烈',
+    description: '激烈翻滚的投掷，适合重大抉择时刻',
+    icon: '🔥',
+    durationMultiplier: 0.45,
+    intensity: 2,
+  },
+};
+
 export interface RollCountDaily {
   date: string;
   count: number;

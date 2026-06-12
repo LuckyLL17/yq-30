@@ -1,5 +1,5 @@
 import React from 'react';
-import { DiceResult, Planet, Sign, House, DiceSet } from '@/types';
+import { DiceResult, Planet, Sign, House, DiceSet, RollForce } from '@/types';
 import { PLANETS, SIGNS, HOUSES } from '@/utils/diceData';
 import { useDiceStore } from '@/store/useDiceStore';
 import Dice3D from './Dice3D';
@@ -15,6 +15,7 @@ interface DiceCardProps {
   diceSet: DiceSet;
   diceType: 'planet' | 'sign' | 'house';
   allSymbols: string[];
+  rollForce?: RollForce;
 }
 
 const DiceCard: React.FC<DiceCardProps> = ({
@@ -28,6 +29,7 @@ const DiceCard: React.FC<DiceCardProps> = ({
   diceSet,
   diceType,
   allSymbols,
+  rollForce = 'normal',
 }) => {
   const style = diceType === 'planet'
     ? diceSet.planetStyle
@@ -71,6 +73,7 @@ const DiceCard: React.FC<DiceCardProps> = ({
           animationName={animationPreset.animationName}
           animationDuration={animationPreset.duration}
           animationEasing={animationPreset.easing}
+          rollForce={rollForce}
         />
       </div>
 
@@ -144,13 +147,14 @@ const EmptyDiceCard: React.FC<{
 interface DiceDisplayProps {
   result: DiceResult | null;
   isRolling: boolean;
+  rollForce?: RollForce;
 }
 
 const planetSymbols = PLANETS.map(p => p.symbol);
 const signSymbols = SIGNS.map(s => s.symbol);
 const houseNumbers = HOUSES.map(h => h.number.toString());
 
-const DiceDisplay: React.FC<DiceDisplayProps> = ({ result, isRolling }) => {
+const DiceDisplay: React.FC<DiceDisplayProps> = ({ result, isRolling, rollForce = 'normal' }) => {
   const getCurrentDiceSet = useDiceStore((s) => s.getCurrentDiceSet);
   const diceSet = getCurrentDiceSet();
 
@@ -178,6 +182,7 @@ const DiceDisplay: React.FC<DiceDisplayProps> = ({ result, isRolling }) => {
         diceSet={diceSet}
         diceType="planet"
         allSymbols={planetSymbols}
+        rollForce={rollForce}
       />
       <DiceCard
         title="星座"
@@ -190,6 +195,7 @@ const DiceDisplay: React.FC<DiceDisplayProps> = ({ result, isRolling }) => {
         diceSet={diceSet}
         diceType="sign"
         allSymbols={signSymbols}
+        rollForce={rollForce}
       />
       <DiceCard
         title="宫位"
@@ -201,6 +207,7 @@ const DiceDisplay: React.FC<DiceDisplayProps> = ({ result, isRolling }) => {
         diceSet={diceSet}
         diceType="house"
         allSymbols={houseNumbers}
+        rollForce={rollForce}
       />
     </div>
   );

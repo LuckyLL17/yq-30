@@ -1,6 +1,7 @@
 import { Planet, Sign, House, DiceResult } from '@/types';
 
 export interface DivinationInterpretation {
+  summary: string;
   overall: string;
   planetInSign: string;
   planetInHouse: string;
@@ -529,11 +530,13 @@ export function generateDivinationInterpretation(result: DiceResult): Divination
   const planetInHouse = PLANET_IN_HOUSE[planet.name]?.[house.number] || `${planet.name}落在${house.name}，你的${planet.meaning}在${house.meaning}的领域中展现。`;
   const signInHouse = SIGN_IN_HOUSE[sign.name]?.[house.number] || `${sign.name}落在${house.name}，你以${sign.meaning}的方式在${house.meaning}的领域中行动。`;
 
+  const summary = generateSummary(planet, sign, house);
   const overall = generateOverallInterpretation(planet, sign, house);
   const keyThemes = generateKeyThemes(planet, sign, house);
   const advice = generateAdvice(planet, sign, house);
 
   return {
+    summary,
     overall,
     planetInSign,
     planetInHouse,
@@ -541,6 +544,67 @@ export function generateDivinationInterpretation(result: DiceResult): Divination
     keyThemes,
     advice,
   };
+}
+
+function generateSummary(planet: Planet, sign: Sign, house: House): string {
+  const essenceMap: Record<string, string> = {
+    '太阳': '照亮前路',
+    '月亮': '倾听心声',
+    '水星': '厘清思路',
+    '金星': '以爱为名',
+    '火星': '付诸行动',
+    '木星': '顺势而为',
+    '土星': '稳扎稳打',
+    '天王星': '突破常规',
+    '海王星': '追随梦想',
+    '冥王星': '浴火重生',
+    '北交点': '向阳而生',
+    '南交点': '放下执念',
+  };
+
+  const energyMap: Record<string, string> = {
+    '白羊座': '勇敢开创',
+    '金牛座': '稳步积累',
+    '双子座': '灵活应变',
+    '巨蟹座': '温柔守护',
+    '狮子座': '自信绽放',
+    '处女座': '精益求精',
+    '天秤座': '平衡和谐',
+    '天蝎座': '深度蜕变',
+    '射手座': '自由探索',
+    '摩羯座': '踏实前行',
+    '水瓶座': '独立创新',
+    '双鱼座': '灵性共鸣',
+  };
+
+  const domainMap: Record<number, string> = {
+    1: '在自我认知中',
+    2: '在价值领域里',
+    3: '在沟通交流间',
+    4: '在内心情感处',
+    5: '在创造表达中',
+    6: '在日常工作里',
+    7: '在亲密关系中',
+    8: '在深度蜕变时',
+    9: '在追寻意义中',
+    10: '在事业舞台上',
+    11: '在团体友谊里',
+    12: '在潜意识深处',
+  };
+
+  const essence = essenceMap[planet.name] || '把握当下';
+  const energy = energyMap[sign.name] || '顺势而为';
+  const domain = domainMap[house.number] || '在生活的方方面面';
+
+  const templates = [
+    `${domain}，请${essence}，以${energy}的姿态前行。`,
+    `${essence}，${domain}用${energy}的方式找到答案。`,
+    `核心启示：${domain}以${energy}的方式${essence}。`,
+    `${domain}，${energy}地${essence}是当下的指引。`,
+  ];
+
+  const seed = (planet.name.length + sign.name.length + house.number) % templates.length;
+  return templates[seed];
 }
 
 function generateOverallInterpretation(planet: Planet, sign: Sign, house: House): string {

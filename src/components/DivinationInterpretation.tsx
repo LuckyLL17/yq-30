@@ -1,7 +1,7 @@
 import React, { useState, useMemo } from 'react';
 import { DiceResult, Planet, Sign, House } from '@/types';
 import { generateDivinationInterpretation, DivinationInterpretation } from '@/utils/divinationData';
-import { Sparkles, ChevronDown, ChevronUp, Lightbulb, Star, BookOpen } from 'lucide-react';
+import { Sparkles, ChevronDown, ChevronUp, Lightbulb, Star, BookOpen, Wand2 } from 'lucide-react';
 
 interface DivinationInterpretationProps {
   result: DiceResult;
@@ -38,6 +38,14 @@ const DivinationInterpretationComponent: React.FC<DivinationInterpretationProps>
 
         {expanded && (
           <div className="px-4 pb-4 space-y-3 border-t border-white/10 pt-4">
+            <div className="p-3 rounded-xl bg-gradient-to-r from-amber-500/15 to-violet-500/15 border border-amber-500/30">
+              <div className="flex items-start gap-2">
+                <Wand2 size={16} className="text-amber-400 flex-shrink-0 mt-0.5" />
+                <p className="text-amber-200 text-sm leading-relaxed font-medium">
+                  {interpretation.summary}
+                </p>
+              </div>
+            </div>
             <p className="text-indigo-200/80 text-sm leading-relaxed">
               {interpretation.overall}
             </p>
@@ -77,6 +85,21 @@ const DivinationInterpretationComponent: React.FC<DivinationInterpretationProps>
           <div>
             <h3 className="text-xl font-bold text-white">占星骰子解析</h3>
             <p className="text-sm text-indigo-300/60">深入解读你的骰子组合</p>
+          </div>
+        </div>
+
+        <div className="mb-6 p-5 rounded-2xl bg-gradient-to-r from-amber-500/20 via-violet-500/15 to-amber-500/20 border border-amber-500/40 relative overflow-hidden">
+          <div className="absolute inset-0 bg-gradient-to-br from-amber-400/5 via-transparent to-violet-400/5 pointer-events-none" />
+          <div className="relative flex items-start gap-3">
+            <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-amber-400/30 to-violet-500/30 flex items-center justify-center flex-shrink-0 mt-0.5">
+              <Wand2 size={18} className="text-amber-300" />
+            </div>
+            <div>
+              <div className="text-xs uppercase tracking-widest text-amber-300/70 mb-1.5">综合含义</div>
+              <p className="text-lg font-semibold text-amber-100 leading-relaxed">
+                {interpretation.summary}
+              </p>
+            </div>
           </div>
         </div>
 

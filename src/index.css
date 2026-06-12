@@ -223,6 +223,81 @@ h1, h2, h3, h4, h5, h6 {
   }
 }
 
+@keyframes dice-fierce-roll {
+  0% {
+    transform: translateZ(0) rotateX(0deg) rotateY(0deg) rotateZ(0deg) scale(1);
+  }
+  10% {
+    transform: translateZ(60px) rotateX(216deg) rotateY(432deg) rotateZ(216deg) scale(1.2);
+  }
+  20% {
+    transform: translateZ(30px) rotateX(432deg) rotateY(864deg) rotateZ(432deg) scale(1.08);
+  }
+  30% {
+    transform: translateZ(70px) rotateX(648deg) rotateY(1296deg) rotateZ(648deg) scale(1.22);
+  }
+  40% {
+    transform: translateZ(40px) rotateX(864deg) rotateY(1728deg) rotateZ(864deg) scale(1.1);
+  }
+  50% {
+    transform: translateZ(80px) rotateX(1080deg) rotateY(2160deg) rotateZ(1080deg) scale(1.25);
+  }
+  60% {
+    transform: translateZ(35px) rotateX(1296deg) rotateY(2592deg) rotateZ(1296deg) scale(1.08);
+  }
+  70% {
+    transform: translateZ(50px) rotateX(1512deg) rotateY(3024deg) rotateZ(1512deg) scale(1.15);
+  }
+  80% {
+    transform: translateZ(20px) rotateX(1728deg) rotateY(3456deg) rotateZ(1728deg) scale(1.05);
+  }
+  90% {
+    transform: translateZ(8px) rotateX(1944deg) rotateY(3888deg) rotateZ(1944deg) scale(1.02);
+  }
+  100% {
+    transform: translateZ(0) rotateX(2160deg) rotateY(4320deg) rotateZ(2160deg) scale(1);
+  }
+}
+
+@keyframes dice-strong-roll {
+  0% {
+    transform: translateZ(0) rotateX(0deg) rotateY(0deg) rotateZ(0deg) scale(1);
+  }
+  20% {
+    transform: translateZ(50px) rotateX(270deg) rotateY(540deg) rotateZ(180deg) scale(1.18);
+  }
+  40% {
+    transform: translateZ(25px) rotateX(540deg) rotateY(1080deg) rotateZ(360deg) scale(1.08);
+  }
+  60% {
+    transform: translateZ(55px) rotateX(810deg) rotateY(1620deg) rotateZ(540deg) scale(1.2);
+  }
+  80% {
+    transform: translateZ(15px) rotateX(1080deg) rotateY(2160deg) rotateZ(720deg) scale(1.05);
+  }
+  100% {
+    transform: translateZ(0) rotateX(1440deg) rotateY(2880deg) rotateZ(900deg) scale(1);
+  }
+}
+
+@keyframes dice-gentle-roll {
+  0% {
+    transform: translateZ(0) rotateX(0deg) rotateY(0deg) rotateZ(0deg) scale(1);
+  }
+  25% {
+    transform: translateZ(15px) rotateX(90deg) rotateY(180deg) rotateZ(45deg) scale(1.04);
+  }
+  50% {
+    transform: translateZ(25px) rotateX(200deg) rotateY(400deg) rotateZ(100deg) scale(1.08);
+  }
+  75% {
+    transform: translateZ(12px) rotateX(320deg) rotateY(640deg) rotateZ(160deg) scale(1.03);
+  }
+  100% {
+    transform: translateZ(0) rotateX(480deg) rotateY(960deg) rotateZ(240deg) scale(1);
+  }
+}
+
 @keyframes dice-bounce {
   0%, 100% {
     transform: translateY(0) scale(1);

@@ -1,4 +1,5 @@
 import React, { useMemo } from 'react';
+import { RollForce, ROLL_FORCE_CONFIG } from '@/types';
 
 interface Dice3DProps {
   symbol: string;
@@ -14,6 +15,7 @@ interface Dice3DProps {
   animationName?: string;
   animationDuration?: number;
   animationEasing?: string;
+  rollForce?: RollForce;
 }
 
 const Dice3D: React.FC<Dice3DProps> = ({
@@ -30,6 +32,7 @@ const Dice3D: React.FC<Dice3DProps> = ({
   animationName = 'dice-3d-roll',
   animationDuration = 1500,
   animationEasing = 'cubic-bezier(0.22, 0.61, 0.36, 1)',
+  rollForce = 'normal',
 }) => {
   const sizeClasses = {
     sm: 'w-16 h-16',
@@ -57,6 +60,17 @@ const Dice3D: React.FC<Dice3DProps> = ({
 
   const isMagic = animationName === 'dice-magic-roll';
 
+  const forceConfig = ROLL_FORCE_CONFIG[rollForce];
+  const adjustedDuration = Math.round(animationDuration * forceConfig.durationMultiplier);
+  const intensityScale = forceConfig.intensity;
+
+  const forceAnimationName = useMemo(() => {
+    if (rollForce === 'gentle') return 'dice-gentle-roll';
+    if (rollForce === 'strong') return 'dice-strong-roll';
+    if (rollForce === 'fierce') return 'dice-fierce-roll';
+    return animationName;
+  }, [rollForce, animationName]);
+
   const faceSymbols = useMemo(() => {
     if (allSymbols && allSymbols.length >= 6) {
       const shuffled = [...allSymbols].sort(() => Math.random() - 0.5);
@@ -79,6 +93,7 @@ const Dice3D: React.FC<Dice3DProps> = ({
 
   const displayFaces = isRolling ? faceSymbols : [symbol, symbol, symbol, symbol, symbol, symbol];
   const finalGlowColor = glowColor || gradientTo;
+  const glowIntensity = isRolling ? 0.6 + intensityScale * 0.3 : 0.45;
 
   return (
     <div
@@ -94,12 +109,12 @@ const Dice3D: React.FC<Dice3DProps> = ({
           style={{
             zIndex: 0,
             animationName: 'dice-magic-glow',
-            animationDuration: `${animationDuration}ms`,
+            animationDuration: `${adjustedDuration}ms`,
             animationTimingFunction: animationEasing,
             animationDelay: `${delay}ms`,
             animationFillMode: 'forwards',
             background: `radial-gradient(circle, ${finalGlowColor}90 0%, ${finalGlowColor}50 25%, transparent 60%)`,
-            boxShadow: `0 0 60px ${finalGlowColor}60, 0 0 120px ${finalGlowColor}30`,
+            boxShadow: `0 0 ${60 * intensityScale}px ${finalGlowColor}60, 0 0 ${120 * intensityScale}px ${finalGlowColor}30`,
             mixBlendMode: 'screen',
           }}
         />
@@ -119,8 +134,8 @@ const Dice3D: React.FC<Dice3DProps> = ({
             willChange: 'transform',
             ...(isRolling
               ? {
-                  animationName,
-                  animationDuration: `${animationDuration}ms`,
+                  animationName: forceAnimationName,
+                  animationDuration: `${adjustedDuration}ms`,
                   animationTimingFunction: animationEasing,
                   animationFillMode: 'forwards',
                   animationDelay: `${delay}ms`,
@@ -176,8 +191,8 @@ const Dice3D: React.FC<Dice3DProps> = ({
           zIndex: 0,
           top: `${sizeValue + 10}px`,
           background: `radial-gradient(ellipse, ${finalGlowColor}45 0%, transparent 75%)`,
-          opacity: isRolling ? 0.8 : 0.45,
-          transform: `translateX(-50%) scale(${isRolling ? 0.6 : 1})`,
+          opacity: isRolling ? glowIntensity : 0.45,
+          transform: `translateX(-50%) scale(${isRolling ? 0.4 + (1 - intensityScale * 0.4) : 1})`,
         }}
       />
     </div>
