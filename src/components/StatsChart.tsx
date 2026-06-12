@@ -2,6 +2,8 @@ import React from 'react';
 import {
   BarChart,
   Bar,
+  LineChart,
+  Line,
   XAxis,
   YAxis,
   CartesianGrid,
@@ -16,20 +18,31 @@ import { ChartDataItem } from '@/types';
 
 interface StatsChartProps {
   data: ChartDataItem[];
-  type?: 'bar' | 'pie';
+  type?: 'bar' | 'pie' | 'line';
   title: string;
   color?: string;
 }
 
 const COLORS = ['#8b5cf6', '#ec4899', '#f59e0b', '#10b981', '#3b82f6', '#06b6d4', '#f43f5e', '#6366f1'];
 
-const CustomTooltip = ({ active, payload }: any) => {
+interface TooltipPayloadEntry {
+  name: string;
+  value: number;
+  payload: { percentage?: string };
+}
+
+interface CustomTooltipProps {
+  active?: boolean;
+  payload?: TooltipPayloadEntry[];
+}
+
+const CustomTooltip: React.FC<CustomTooltipProps> = ({ active, payload }) => {
   if (active && payload && payload.length) {
     return (
       <div className="px-4 py-3 rounded-xl bg-indigo-950/90 backdrop-blur-md border border-violet-500/30 shadow-xl">
         <p className="text-white font-medium">{payload[0].name}</p>
         <p className="text-violet-300 text-sm mt-1">
-          次数: {payload[0].value} · {payload[0].payload.percentage}
+          次数: {payload[0].value}{payload[0].payload.percentage ? ` · ${payload[0].payload.percentage}` : ''}
         </p>
       </div>
     );
@@ -67,6 +80,33 @@ const StatsChart: React.FC<StatsChartProps> = ({ data, type = 'bar', title, colo
                 ))}
               </Bar>
             </BarChart>
+          </ResponsiveContainer>
+        ) : type === 'line' ? (
+          <ResponsiveContainer width="100%" height="100%">
+            <LineChart data={displayData} margin={{ top: 10, right: 30, left: 0, bottom: 40 }}>
+              <CartesianGrid strokeDasharray="3 3" stroke="#ffffff10" />
+              <XAxis
+                dataKey="name"
+                stroke="#ffffff50"
+                tick={{ fill: '#a5b4fc', fontSize: 11 }}
+                angle={-45}
+                textAnchor="end"
+                height={60}
+              />
+              <YAxis
+                stroke="#ffffff50"
+                tick={{ fill: '#a5b4fc', fontSize: 11 }}
+              />
+              <Tooltip content={<CustomTooltip />} />
+              <Line
+                type="monotone"
+                dataKey="value"
+                stroke={color}
+                strokeWidth={2}
+                dot={{ fill: color, r: 3 }}
+                activeDot={{ r: 5, fill: color }}
+              />
+            </LineChart>
           </ResponsiveContainer>
         ) : (
           <ResponsiveContainer width="100%" height="100%">

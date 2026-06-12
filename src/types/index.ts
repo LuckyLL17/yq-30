@@ -269,3 +269,55 @@ export interface Collection {
 }
 
 export type CollectionSortBy = 'custom' | 'time-desc' | 'time-asc' | 'planet' | 'sign' | 'house';
+
+export interface RollCountDaily {
+  date: string;
+  count: number;
+}
+
+export interface RollCountStats {
+  daily: RollCountDaily[];
+  totalDays: number;
+  totalRolls: number;
+  avgRollsPerDay: number;
+  maxRollsDay: RollCountDaily | null;
+  currentStreak: number;
+}
+
+export interface TimeSlotDistribution {
+  slot: string;
+  label: string;
+  count: number;
+  percentage: string;
+}
+
+export interface TimeDistributionStats {
+  hourly: Array<{ hour: number; count: number }>;
+  slots: TimeSlotDistribution[];
+  peakHour: number | null;
+  peakSlot: TimeSlotDistribution | null;
+}
+
+export interface HeatmapCell {
+  row: string;
+  col: string;
+  value: number;
+}
+
+export interface HeatmapData {
+  title: string;
+  rowLabels: string[];
+  colLabels: string[];
+  cells: HeatmapCell[];
+  maxValue: number;
+}
+
+export interface AnalysisReport {
+  generatedAt: string;
+  totalRecords: number;
+  summary: string;
+  sections: Array<{
+    title: string;
+    content: string;
+  }>;
+}
