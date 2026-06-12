@@ -627,9 +627,9 @@ function generateOverallInterpretation(planet: Planet, sign: Sign, house: House)
 function generateKeyThemes(planet: Planet, sign: Sign, house: House): string[] {
   const themes: string[] = [];
 
-  themes.push(`${planet.meaning.split('、')[0]}`);
-  themes.push(`${sign.meaning.split('、')[0]}`);
-  themes.push(`${house.meaning.split('、')[0]}`);
+  themes.push(planet.meaning.split('、')[0]);
+  themes.push(sign.meaning.split('、')[0]);
+  themes.push(house.meaning.split('、')[0]);
 
   const planetThemes: Record<string, string[]> = {
     '太阳': ['自我认同', '生命力', '创造力'],
@@ -683,7 +683,7 @@ function generateKeyThemes(planet: Planet, sign: Sign, house: House): string[] {
   return [...new Set(themes)].slice(0, 6);
 }
 
-function generateAdvice(planet: Planet, sign: Sign, house: House): string {
+function generateAdvice(planet: Planet, _sign: Sign, _house: House): string {
   const planetAdvice: Record<string, string> = {
     '太阳': '建议你关注自我价值的实现，让自己的光芒自然散发出来。做真实的自己，你的自信就是最好的答案。',
     '月亮': '建议你倾听内心的感受，给自己足够的情绪关怀。安全感来自内心的平静，而非外在的事物。',

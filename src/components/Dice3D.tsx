@@ -73,6 +73,7 @@ const Dice3D: React.FC<Dice3DProps> = ({
 
   const faceSymbols = useMemo(() => {
     if (allSymbols && allSymbols.length >= 6) {
+      // eslint-disable-next-line react-hooks/purity
       const shuffled = [...allSymbols].sort(() => Math.random() - 0.5);
       return shuffled.slice(0, 6);
     }

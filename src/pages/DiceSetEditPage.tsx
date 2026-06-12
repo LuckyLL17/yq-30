@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useMemo } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useDiceStore } from '@/store/useDiceStore';
 import { DiceSet, DiceVisualStyle } from '@/types';
@@ -43,7 +43,7 @@ const DiceStyleEditor: React.FC<DiceStyleEditorProps> = ({
   animationName,
   animationDuration,
   animationEasing,
-  size,
+  size: _size,
   isPreviewRolling,
 }) => {
   const { label, symbol } = CATEGORY_LABELS[category];
@@ -133,7 +133,7 @@ const DiceStyleEditor: React.FC<DiceStyleEditorProps> = ({
 const DiceSetEditPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const { diceSets, updateDiceSet, addDiceSet, getCurrentDiceSet } = useDiceStore();
+  const { diceSets, updateDiceSet, addDiceSet } = useDiceStore();
   const { previewSound } = useSoundEffects();
 
   const existingSet = useMemo(() => diceSets.find((d) => d.id === id), [diceSets, id]);
@@ -201,7 +201,7 @@ const DiceSetEditPage: React.FC = () => {
 
     setSaved(true);
     setTimeout(() => {
-      navigate('/dice-sets');
+      void navigate('/dice-sets');
     }, 600);
   };
 
@@ -224,7 +224,7 @@ const DiceSetEditPage: React.FC = () => {
       <div className="max-w-7xl mx-auto">
         <div className="flex items-center justify-between mb-8">
           <button
-            onClick={() => navigate('/dice-sets')}
+            onClick={() => { void navigate('/dice-sets'); }}
             className="flex items-center gap-2 px-4 py-2 rounded-xl text-indigo-300/80 hover:text-white hover:bg-white/5 transition-all"
           >
             <ArrowLeft size={20} />

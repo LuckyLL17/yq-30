@@ -7,7 +7,7 @@ function getAudioContext(): AudioContext | null {
   if (typeof window === 'undefined') return null;
   if (!audioContext) {
     try {
-      const AudioCtx = window.AudioContext || (window as any).webkitAudioContext;
+      const AudioCtx = window.AudioContext || (window as unknown as { webkitAudioContext?: typeof AudioContext }).webkitAudioContext;
       if (AudioCtx) {
         audioContext = new AudioCtx();
       }
@@ -28,7 +28,7 @@ export function useSoundEffects() {
         gain.gain.setValueAtTime(gain.gain.value, audioContext!.currentTime);
         gain.gain.exponentialRampToValueAtTime(0.0001, audioContext!.currentTime + 0.05);
         osc.stop(audioContext!.currentTime + 0.05);
-      } catch {}
+      } catch { /* intentional */ }
     });
     activeNodesRef.current = [];
   }, []);
@@ -71,7 +71,7 @@ export function useSoundEffects() {
           (n) => n.osc !== oscillator
         );
       }, (sound.duration + 0.1) * 1000);
-    } catch {}
+    } catch { /* intentional */ }
   }, []);
 
   const playRollSound = useCallback((sound: SoundEffect) => {

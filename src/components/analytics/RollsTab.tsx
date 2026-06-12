@@ -19,7 +19,7 @@ const RollsTab: React.FC<RollsTabProps> = ({ rollCounts, rollTrendData }) => {
     { label: '连续天数', value: rollCounts.currentStreak, color: 'from-emerald-500 to-green-600' },
   ];
 
-  const getMaxCount = (days: RollCountDaily[]) => {
+  const getMaxCount = (_days: RollCountDaily[]) => {
     return rollCounts.maxRollsDay?.count || 1;
   };
 

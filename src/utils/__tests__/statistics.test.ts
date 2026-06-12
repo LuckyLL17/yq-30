@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach, vi } from 'vitest';
+import { describe, it, expect } from 'vitest';
 import {
   calculateFrequency,
   calculateCombinations,
@@ -13,7 +13,7 @@ import {
   generateAnalysisReport,
 } from '../statistics';
 import { PLANETS, SIGNS, HOUSES } from '../diceData';
-import type { DiceRecord, FrequencyStats, CombinationStats, RollCountStats, TimeDistributionStats } from '@/types';
+import type { DiceRecord } from '@/types';
 
 function createMockRecord(overrides: Partial<DiceRecord> = {}): DiceRecord {
   return {
@@ -74,7 +74,7 @@ describe('statistics utils', () => {
         expect(result.sign).toHaveProperty(s.name);
       });
       HOUSES.forEach(h => {
-        expect(result.house).toHaveProperty(h.number);
+        expect(result.house).toHaveProperty(String(h.number));
       });
     });
   });

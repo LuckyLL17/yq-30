@@ -1,5 +1,5 @@
 import React from 'react';
-import { DiceResult, Planet, Sign, House, DiceSet, RollForce } from '@/types';
+import { DiceResult, DiceSet, RollForce } from '@/types';
 import { PLANETS, SIGNS, HOUSES } from '@/utils/diceData';
 import { useDiceStore } from '@/store/useDiceStore';
 import Dice3D from './Dice3D';

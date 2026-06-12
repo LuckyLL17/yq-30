@@ -1,6 +1,6 @@
 import React, { useState, useMemo } from 'react';
-import { DiceResult, Planet, Sign, House } from '@/types';
-import { generateDivinationInterpretation, DivinationInterpretation } from '@/utils/divinationData';
+import { DiceResult } from '@/types';
+import { generateDivinationInterpretation } from '@/utils/divinationData';
 import { Sparkles, ChevronDown, ChevronUp, Lightbulb, Star, BookOpen, Wand2 } from 'lucide-react';
 
 interface DivinationInterpretationProps {

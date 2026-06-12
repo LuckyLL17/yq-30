@@ -213,7 +213,7 @@ const RecordCard: React.FC<RecordCardProps> = ({ record }) => {
       )}
 
       {expanded && interpretation && (
-        <div className={`${record.notes ? '' : 'pt-4 border-t border-white/10'}`}>
+        <div className={record.notes ? '' : 'pt-4 border-t border-white/10'}>
           <div className="flex items-center gap-2 mb-3">
             <Sparkles size={14} className="text-amber-400" />
             <span className="text-xs text-indigo-300/60">占卜解析</span>

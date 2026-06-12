@@ -1,7 +1,7 @@
 import React from 'react';
 
 interface StatCardProps {
-  label: string;
+  label: React.ReactNode;
   value: string | number;
   color?: string;
   size?: 'sm' | 'md' | 'lg';

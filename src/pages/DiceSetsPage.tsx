@@ -148,7 +148,7 @@ const DiceSetsPage: React.FC = () => {
   } = useDiceStore();
   const handleCreateNew = () => {
     const newSet = addDiceSet(createDefaultDiceSet());
-    navigate(`/dice-sets/edit/${newSet.id}`);
+    void navigate(`/dice-sets/edit/${newSet.id}`);
   };
 
   return (
@@ -214,7 +214,7 @@ const DiceSetsPage: React.FC = () => {
                 diceSet={diceSet}
                 isActive={diceSet.id === currentDiceSetId}
                 onSelect={() => setCurrentDiceSet(diceSet.id)}
-                onEdit={() => navigate(`/dice-sets/edit/${diceSet.id}`)}
+                onEdit={() => { void navigate(`/dice-sets/edit/${diceSet.id}`); }}
                 onDelete={() => deleteDiceSet(diceSet.id)}
               />
             ))}

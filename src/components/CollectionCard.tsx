@@ -18,7 +18,7 @@ const CollectionCard: React.FC<CollectionCardProps> = ({ collection, onEdit, onD
   const recordCount = records.length;
 
   const handleClick = () => {
-    navigate(`/collections/${collection.id}`);
+    void navigate(`/collections/${collection.id}`);
   };
 
   const handleEdit = (e: React.MouseEvent) => {

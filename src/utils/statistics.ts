@@ -115,7 +115,7 @@ export function calculateTypeDistribution(records: DiceRecord[]): TypeDistributi
 
 export function getTopItems(freq: Record<string | number, number>, topN: number = 5): Array<{ name: string; value: number }> {
   return Object.entries(freq)
-    .map(([name, value]) => ({ name: String(name), value }))
+    .map(([name, value]) => ({ name, value }))
     .sort((a, b) => b.value - a.value)
     .slice(0, topN);
 }
@@ -123,7 +123,7 @@ export function getTopItems(freq: Record<string | number, number>, topN: number 
 export function toChartData(freq: Record<string | number, number>, total: number): ChartDataItem[] {
   return Object.entries(freq)
     .map(([name, value]) => ({
-      name: String(name),
+      name,
       value,
       percentage: total > 0 ? ((value / total) * 100).toFixed(1) + '%' : '0%',
     }))

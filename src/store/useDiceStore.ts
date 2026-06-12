@@ -1,8 +1,9 @@
 import { create } from 'zustand';
-import { persist } from 'zustand/middleware';
-import { DiceRecord, QuestionType, DiceResult, DailyFortune, DailyCheckInStats, DiceSet, Collection, CollectionSortBy } from '@/types';
+import { persist, createJSONStorage } from 'zustand/middleware';
+import type { DiceRecord, QuestionType, DiceResult, DailyFortune, DailyCheckInStats, DiceSet, Collection, CollectionSortBy } from '@/types';
 import { DEFAULT_QUESTION_TYPES, generateId, rollDice, generateDailyFortune, getTodayDateString, isTodayCheckedIn, calculateStreak } from '@/utils/diceData';
 import { DEFAULT_DICE_SETS } from '@/utils/diceSetPresets';
+import { validatePersistedState } from '@/schemas/storeSchema';
 
 interface DiceState {
   records: DiceRecord[];
@@ -186,7 +187,7 @@ export const useDiceStore = create<DiceState>()(
 
       deleteDiceSet: (id) => {
         const target = get().diceSets.find((d) => d.id === id);
-        if (target && target.isDefault) return;
+        if (target?.isDefault) return;
         set((state) => {
           const newSets = state.diceSets.filter((d) => d.id !== id);
           const newCurrentId = state.currentDiceSetId === id
@@ -304,6 +305,16 @@ export const useDiceStore = create<DiceState>()(
     }),
     {
       name: 'astrology-dice-storage',
+      storage: createJSONStorage(() => window.localStorage, {
+        reviver: (_key: string, value: unknown): unknown => value,
+      }),
+      merge: (persistedState, currentState): DiceState => {
+        const validated = validatePersistedState(persistedState);
+        if (validated === null) {
+          return currentState;
+        }
+        return { ...currentState, ...validated };
+      },
     }
   )
 );

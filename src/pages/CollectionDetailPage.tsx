@@ -4,7 +4,6 @@ import { useDiceStore } from '@/store/useDiceStore';
 import { CollectionSortBy, DiceRecord } from '@/types';
 import {
   ArrowLeft,
-  SortAsc,
   Trash2,
   BarChart3,
   List,
@@ -98,7 +97,7 @@ const CollectionDetailPage: React.FC = () => {
     if (!collection) return;
     if (confirm(`确定要删除合集"${collection.name}"吗？（不会删除合集中的记录）`)) {
       deleteCollection(collection.id);
-      navigate('/collections');
+      void navigate('/collections');
     }
   };
 
@@ -108,7 +107,7 @@ const CollectionDetailPage: React.FC = () => {
         <div className="text-center">
           <p className="text-indigo-300/70 mb-4">合集不存在</p>
           <button
-            onClick={() => navigate('/collections')}
+            onClick={() => { void navigate('/collections'); }}
             className="text-violet-400 hover:text-violet-300"
           >
             返回合集列表
@@ -163,7 +162,7 @@ const CollectionDetailPage: React.FC = () => {
       <div className="max-w-6xl mx-auto">
         <div className="flex items-center gap-4 mb-6">
           <button
-            onClick={() => navigate('/collections')}
+            onClick={() => { void navigate('/collections'); }}
             className="p-2 rounded-xl bg-white/5 border border-white/10 text-indigo-300/70 hover:text-white hover:bg-white/10 transition-all"
           >
             <ArrowLeft size={20} />
@@ -294,7 +293,7 @@ const CollectionDetailPage: React.FC = () => {
               去历史记录中，将记录添加到这个合集里吧
             </p>
             <button
-              onClick={() => navigate('/records')}
+              onClick={() => { void navigate('/records'); }}
               className="text-violet-400 hover:text-violet-300 text-sm"
             >
               前往历史记录 →

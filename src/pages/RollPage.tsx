@@ -85,6 +85,7 @@ const RollPage: React.FC = () => {
         '',
         `【占卜建议】${interpretation.advice}`,
       ].join('\n');
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setAutoFillNotes(notesText);
     }
   }, [currentResult, showInterpretation, isRolling]);
@@ -203,7 +204,7 @@ const RollPage: React.FC = () => {
           </div>
           <div className="flex items-center justify-center gap-4 mb-4">
             <button
-              onClick={() => navigate('/dice-sets')}
+              onClick={() => { void navigate('/dice-sets'); }}
               className="
                 inline-flex items-center gap-2 px-4 py-2 rounded-xl
                 bg-white/5 border border-white/10 text-sm
@@ -339,7 +340,7 @@ const RollPage: React.FC = () => {
 
             <div className="flex flex-col items-center gap-4 mb-10">
               <button
-                onClick={handleRoll}
+                onClick={() => handleRoll()}
                 disabled={isRolling}
                 className="
                   relative px-12 py-5 rounded-2xl text-xl font-bold text-white

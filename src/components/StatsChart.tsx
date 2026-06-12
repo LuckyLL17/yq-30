@@ -37,7 +37,7 @@ interface CustomTooltipProps {
 }
 
 const CustomTooltip: React.FC<CustomTooltipProps> = ({ active, payload }) => {
-  if (active && payload && payload.length) {
+  if (active && payload?.length) {
     return (
       <div className="px-4 py-3 rounded-xl bg-indigo-950/90 backdrop-blur-md border border-violet-500/30 shadow-xl">
         <p className="text-white font-medium">{payload[0].name}</p>
@@ -75,7 +75,7 @@ const StatsChart: React.FC<StatsChartProps> = ({ data, type = 'bar', title, colo
               />
               <Tooltip content={<CustomTooltip />} />
               <Bar dataKey="value" radius={[6, 6, 0, 0]}>
-                {displayData.map((entry, index) => (
+                {displayData.map((_entry, index) => (
                   <Cell key={`cell-${index}`} fill={color} fillOpacity={0.8 - index * 0.05} />
                 ))}
               </Bar>
@@ -120,7 +120,7 @@ const StatsChart: React.FC<StatsChartProps> = ({ data, type = 'bar', title, colo
                 paddingAngle={2}
                 dataKey="value"
               >
-                {displayData.map((entry, index) => (
+                {displayData.map((_entry, index) => (
                   <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                 ))}
               </Pie>

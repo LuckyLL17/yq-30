@@ -34,7 +34,7 @@ const DailyPage: React.FC = () => {
   const [showAnimation, setShowAnimation] = useState(false);
   const [isRevealing, setIsRevealing] = useState(false);
   const [expandedDate, setExpandedDate] = useState<string | null>(null);
-  const [revealComplete, setRevealComplete] = useState(false);
+  const [, setRevealComplete] = useState(false);
 
   const todayChecked = isTodayCheckedIn();
   const todayFortune = getTodayFortune();
@@ -138,7 +138,7 @@ const DailyPage: React.FC = () => {
             <div className="relative p-8 rounded-3xl backdrop-blur-md bg-white/5 border border-white/10 overflow-hidden">
               {showAnimation && (
                 <div className="absolute inset-0 pointer-events-none">
-                  {[...Array(12)].map((_, i) => (
+                  {Array.from({ length: 12 }).map((_, i) => (
                     <div
                       key={i}
                       className="absolute text-2xl animate-ping"
@@ -316,8 +316,8 @@ const DailyPage: React.FC = () => {
                 const isExpanded = expandedDate === fortune.date;
                 const isToday = fortune.date === todayStr;
                 const planet = getPlanetByName(fortune.planet);
-                const sign = getSignByName(fortune.sign);
-                const house = getHouseByNumber(fortune.house);
+                getSignByName(fortune.sign);
+                getHouseByNumber(fortune.house);
 
                 return (
                   <div

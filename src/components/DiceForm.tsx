@@ -28,18 +28,21 @@ const DiceForm: React.FC<DiceFormProps> = ({
 
   useEffect(() => {
     if (initialQuestion !== undefined) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setQuestion(initialQuestion);
     }
   }, [initialQuestion]);
 
   useEffect(() => {
     if (initialQuestionType !== undefined) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setQuestionType(initialQuestionType);
     }
   }, [initialQuestionType]);
 
   useEffect(() => {
     if (autoFillNotes !== undefined && autoFillNotes !== '') {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setNotes(autoFillNotes);
     }
   }, [autoFillNotes]);
@@ -47,9 +50,11 @@ const DiceForm: React.FC<DiceFormProps> = ({
   useEffect(() => {
     if (result) {
       if (initialQuestion === undefined) {
+        // eslint-disable-next-line react-hooks/set-state-in-effect
         setQuestion('');
       }
       if (autoFillNotes === undefined) {
+        // eslint-disable-next-line react-hooks/set-state-in-effect
         setNotes('');
       }
     }
