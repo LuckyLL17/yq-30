@@ -80,12 +80,12 @@ const RollPage: React.FC = () => {
     setSelectedTemplate(template);
   }, []);
 
-  const handleBreathingComplete = useCallback(() => {
+  const handleBreathingStartRoll = useCallback(() => {
     setShowBreathingGuide(false);
     setTimeout(() => handleRoll(), 300);
   }, [handleRoll]);
 
-  const handleBreathingSkip = useCallback(() => {
+  const handleBreathingClose = useCallback(() => {
     setShowBreathingGuide(false);
   }, []);
 
@@ -157,8 +157,8 @@ const RollPage: React.FC = () => {
         {showBreathingGuide ? (
           <div className="mb-10 p-8 rounded-3xl backdrop-blur-md bg-white/5 border border-white/10">
             <BreathingGuide
-              onComplete={handleBreathingComplete}
-              onSkip={handleBreathingSkip}
+              onStartRoll={handleBreathingStartRoll}
+              onClose={handleBreathingClose}
             />
           </div>
         ) : (
