@@ -60,7 +60,7 @@ const Dice3D: React.FC<Dice3DProps> = ({
 
   const isMagic = animationName === 'dice-magic-roll';
 
-  const forceConfig = ROLL_FORCE_CONFIG[rollForce];
+  const forceConfig = ROLL_FORCE_CONFIG[rollForce] || ROLL_FORCE_CONFIG.normal;
   const adjustedDuration = Math.round(animationDuration * forceConfig.durationMultiplier);
   const intensityScale = forceConfig.intensity;
 

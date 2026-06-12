@@ -45,7 +45,8 @@ const RollPage: React.FC = () => {
 
     const actualForce = force || rollForce;
     const diceSet = getCurrentDiceSet();
-    const forceMultiplier = ROLL_FORCE_CONFIG[actualForce].durationMultiplier;
+    const forceConfig = ROLL_FORCE_CONFIG[actualForce] || ROLL_FORCE_CONFIG.normal;
+    const forceMultiplier = forceConfig.durationMultiplier;
     const animDuration = Math.round(diceSet.animationPreset.duration * forceMultiplier);
 
     setRolling(true);
@@ -305,7 +306,7 @@ const RollPage: React.FC = () => {
               </div>
               <div className="grid grid-cols-4 gap-2">
                 {rollForceOptions.map((force) => {
-                  const config = ROLL_FORCE_CONFIG[force];
+                  const config = ROLL_FORCE_CONFIG[force] || ROLL_FORCE_CONFIG.normal;
                   const isActive = rollForce === force;
                   return (
                     <button
@@ -331,7 +332,7 @@ const RollPage: React.FC = () => {
               </div>
               <div className="text-center mt-3">
                 <span className="text-xs text-indigo-300/50">
-                  {ROLL_FORCE_CONFIG[rollForce].description}
+                  {(ROLL_FORCE_CONFIG[rollForce] || ROLL_FORCE_CONFIG.normal).description}
                 </span>
               </div>
             </div>
