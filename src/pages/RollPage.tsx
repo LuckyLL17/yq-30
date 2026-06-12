@@ -4,7 +4,8 @@ import DiceDisplay from '@/components/DiceDisplay';
 import DiceForm from '@/components/DiceForm';
 import DivinationInterpretation from '@/components/DivinationInterpretation';
 import QuestionTemplateSelector from '@/components/QuestionTemplateSelector';
-import { Sparkles, Check, Palette } from 'lucide-react';
+import BreathingGuide from '@/components/BreathingGuide';
+import { Sparkles, Check, Palette, Wind } from 'lucide-react';
 import { useSoundEffects } from '@/hooks/useSoundEffects';
 import { useNavigate } from 'react-router-dom';
 import { QuestionTemplate } from '@/utils/questionTemplates';
@@ -17,6 +18,7 @@ const RollPage: React.FC = () => {
   const [showInterpretation, setShowInterpretation] = useState(false);
   const [selectedTemplate, setSelectedTemplate] = useState<QuestionTemplate | null>(null);
   const [autoFillNotes, setAutoFillNotes] = useState<string>('');
+  const [showBreathingGuide, setShowBreathingGuide] = useState(false);
   const { playRollSound, playStopSound } = useSoundEffects();
   const rollTimerRef = useRef<NodeJS.Timeout[]>([]);
 
@@ -78,6 +80,20 @@ const RollPage: React.FC = () => {
     setSelectedTemplate(template);
   }, []);
 
+  const handleBreathingComplete = useCallback(() => {
+    setShowBreathingGuide(false);
+    setTimeout(() => handleRoll(), 300);
+  }, [handleRoll]);
+
+  const handleBreathingSkip = useCallback(() => {
+    setShowBreathingGuide(false);
+  }, []);
+
+  const handleFocusedRoll = useCallback(() => {
+    if (isRolling) return;
+    setShowBreathingGuide(true);
+  }, [isRolling]);
+
   const handleSaved = useCallback(() => {
     setShowSuccess(true);
     setSelectedTemplate(null);
@@ -138,40 +154,66 @@ const RollPage: React.FC = () => {
           </div>
         )}
 
-        <div className="mb-10">
-          <DiceDisplay result={currentResult} isRolling={isRolling} />
-        </div>
+        {showBreathingGuide ? (
+          <div className="mb-10 p-8 rounded-3xl backdrop-blur-md bg-white/5 border border-white/10">
+            <BreathingGuide
+              onComplete={handleBreathingComplete}
+              onSkip={handleBreathingSkip}
+            />
+          </div>
+        ) : (
+          <>
+            <div className="mb-10">
+              <DiceDisplay result={currentResult} isRolling={isRolling} />
+            </div>
 
-        <div className="flex justify-center mb-10">
-          <button
-            onClick={handleRoll}
-            disabled={isRolling}
-            className="
-              relative px-12 py-5 rounded-2xl text-xl font-bold text-white
-              bg-gradient-to-r from-violet-600 via-purple-600 to-violet-600
-              hover:from-violet-500 hover:via-purple-500 hover:to-violet-500
-              disabled:opacity-50 disabled:cursor-not-allowed
-              transition-all duration-300 transform active:scale-[0.97]
-              shadow-xl shadow-violet-500/30 hover:shadow-violet-500/50
-              overflow-hidden group
-            "
-          >
-            <span className="relative z-10 flex items-center gap-3">
-              {isRolling ? (
-                <>
-                  <Sparkles className="animate-pulse" size={24} />
-                  投掷中...
-                </>
-              ) : (
-                <>
-                  <Sparkles size={24} />
-                  投掷骰子
-                </>
-              )}
-            </span>
-            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000" />
-          </button>
-        </div>
+            <div className="flex flex-col items-center gap-4 mb-10">
+              <button
+                onClick={handleRoll}
+                disabled={isRolling}
+                className="
+                  relative px-12 py-5 rounded-2xl text-xl font-bold text-white
+                  bg-gradient-to-r from-violet-600 via-purple-600 to-violet-600
+                  hover:from-violet-500 hover:via-purple-500 hover:to-violet-500
+                  disabled:opacity-50 disabled:cursor-not-allowed
+                  transition-all duration-300 transform active:scale-[0.97]
+                  shadow-xl shadow-violet-500/30 hover:shadow-violet-500/50
+                  overflow-hidden group
+                "
+              >
+                <span className="relative z-10 flex items-center gap-3">
+                  {isRolling ? (
+                    <>
+                      <Sparkles className="animate-pulse" size={24} />
+                      投掷中...
+                    </>
+                  ) : (
+                    <>
+                      <Sparkles size={24} />
+                      投掷骰子
+                    </>
+                  )}
+                </span>
+                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000" />
+              </button>
+
+              <button
+                onClick={handleFocusedRoll}
+                disabled={isRolling}
+                className="
+                  flex items-center gap-2 px-6 py-3 rounded-xl text-sm font-medium
+                  text-violet-300 bg-violet-500/10 border border-violet-500/30
+                  hover:bg-violet-500/20 hover:text-white
+                  disabled:opacity-50 disabled:cursor-not-allowed
+                  transition-all duration-300
+                "
+              >
+                <Wind size={18} />
+                专注投掷（先呼吸静心）
+              </button>
+            </div>
+          </>
+        )}
 
         {currentResult && showInterpretation && !isRolling && (
           <div className="max-w-2xl mx-auto mb-8">
