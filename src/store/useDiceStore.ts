@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import { DiceRecord, QuestionType, DiceResult, DailyFortune, DailyCheckInStats, DiceSet } from '@/types';
+import { DiceRecord, QuestionType, DiceResult, DailyFortune, DailyCheckInStats, DiceSet, Collection, CollectionSortBy } from '@/types';
 import { DEFAULT_QUESTION_TYPES, generateId, rollDice, generateDailyFortune, getTodayDateString, isTodayCheckedIn, calculateStreak } from '@/utils/diceData';
 import { DEFAULT_DICE_SETS } from '@/utils/diceSetPresets';
 
@@ -12,6 +12,7 @@ interface DiceState {
   dailyFortunes: DailyFortune[];
   diceSets: DiceSet[];
   currentDiceSetId: string | null;
+  collections: Collection[];
   addRecord: (data: Omit<DiceRecord, 'id' | 'timestamp'>) => void;
   deleteRecord: (id: string) => void;
   clearAllRecords: () => void;
@@ -31,6 +32,14 @@ interface DiceState {
   updateDiceSet: (id: string, updates: Partial<DiceSet>) => void;
   deleteDiceSet: (id: string) => void;
   setCurrentDiceSet: (id: string) => void;
+  addCollection: (data: Omit<Collection, 'id' | 'createdAt' | 'updatedAt' | 'recordIds'>) => Collection;
+  updateCollection: (id: string, updates: Partial<Collection>) => void;
+  deleteCollection: (id: string) => void;
+  addRecordToCollection: (collectionId: string, recordId: string) => void;
+  removeRecordFromCollection: (collectionId: string, recordId: string) => void;
+  reorderRecordsInCollection: (collectionId: string, recordIds: string[]) => void;
+  getCollectionRecords: (collectionId: string, sortBy?: CollectionSortBy) => DiceRecord[];
+  getCollectionsForRecord: (recordId: string) => Collection[];
 }
 
 export const useDiceStore = create<DiceState>()(
@@ -43,6 +52,7 @@ export const useDiceStore = create<DiceState>()(
       dailyFortunes: [],
       diceSets: DEFAULT_DICE_SETS,
       currentDiceSetId: 'set-classic',
+      collections: [],
 
       rollTheDice: () => {
         const result = rollDice();
@@ -191,6 +201,105 @@ export const useDiceStore = create<DiceState>()(
 
       setCurrentDiceSet: (id) => {
         set({ currentDiceSetId: id });
+      },
+
+      addCollection: (data) => {
+        const now = new Date().toISOString();
+        const newCollection: Collection = {
+          ...data,
+          id: generateId(),
+          recordIds: [],
+          createdAt: now,
+          updatedAt: now,
+        };
+        set((state) => ({
+          collections: [newCollection, ...state.collections],
+        }));
+        return newCollection;
+      },
+
+      updateCollection: (id, updates) => {
+        set((state) => ({
+          collections: state.collections.map((c) =>
+            c.id === id ? { ...c, ...updates, updatedAt: new Date().toISOString() } : c
+          ),
+        }));
+      },
+
+      deleteCollection: (id) => {
+        set((state) => ({
+          collections: state.collections.filter((c) => c.id !== id),
+        }));
+      },
+
+      addRecordToCollection: (collectionId, recordId) => {
+        set((state) => ({
+          collections: state.collections.map((c) => {
+            if (c.id !== collectionId) return c;
+            if (c.recordIds.includes(recordId)) return c;
+            return {
+              ...c,
+              recordIds: [...c.recordIds, recordId],
+              updatedAt: new Date().toISOString(),
+            };
+          }),
+        }));
+      },
+
+      removeRecordFromCollection: (collectionId, recordId) => {
+        set((state) => ({
+          collections: state.collections.map((c) => {
+            if (c.id !== collectionId) return c;
+            return {
+              ...c,
+              recordIds: c.recordIds.filter((id) => id !== recordId),
+              updatedAt: new Date().toISOString(),
+            };
+          }),
+        }));
+      },
+
+      reorderRecordsInCollection: (collectionId, recordIds) => {
+        set((state) => ({
+          collections: state.collections.map((c) => {
+            if (c.id !== collectionId) return c;
+            return {
+              ...c,
+              recordIds,
+              updatedAt: new Date().toISOString(),
+            };
+          }),
+        }));
+      },
+
+      getCollectionRecords: (collectionId, sortBy = 'custom') => {
+        const state = get();
+        const collection = state.collections.find((c) => c.id === collectionId);
+        if (!collection) return [];
+
+        const records = collection.recordIds
+          .map((id) => state.records.find((r) => r.id === id))
+          .filter((r): r is DiceRecord => r !== undefined);
+
+        switch (sortBy) {
+          case 'time-desc':
+            return [...records].sort((a, b) => b.timestamp.localeCompare(a.timestamp));
+          case 'time-asc':
+            return [...records].sort((a, b) => a.timestamp.localeCompare(b.timestamp));
+          case 'planet':
+            return [...records].sort((a, b) => a.planet.localeCompare(b.planet));
+          case 'sign':
+            return [...records].sort((a, b) => a.sign.localeCompare(b.sign));
+          case 'house':
+            return [...records].sort((a, b) => a.house - b.house);
+          case 'custom':
+          default:
+            return records;
+        }
+      },
+
+      getCollectionsForRecord: (recordId) => {
+        return get().collections.filter((c) => c.recordIds.includes(recordId));
       },
     }),
     {

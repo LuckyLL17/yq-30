@@ -257,3 +257,15 @@ export interface DiceSet {
   stopSound: SoundEffect;
   size: 'sm' | 'md' | 'lg';
 }
+
+export interface Collection {
+  id: string;
+  name: string;
+  description: string;
+  color: string;
+  recordIds: string[];
+  createdAt: string;
+  updatedAt: string;
+}
+
+export type CollectionSortBy = 'custom' | 'time-desc' | 'time-asc' | 'planet' | 'sign' | 'house';

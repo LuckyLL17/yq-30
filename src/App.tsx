@@ -8,6 +8,8 @@ import DailyPage from '@/pages/DailyPage';
 import DiceSetsPage from '@/pages/DiceSetsPage';
 import DiceSetEditPage from '@/pages/DiceSetEditPage';
 import KnowledgeBasePage from '@/pages/KnowledgeBasePage';
+import CollectionsPage from '@/pages/CollectionsPage';
+import CollectionDetailPage from '@/pages/CollectionDetailPage';
 
 export default function App() {
   return (
@@ -23,6 +25,8 @@ export default function App() {
           <Route path="/knowledge" element={<KnowledgeBasePage />} />
           <Route path="/records" element={<RecordsPage />} />
           <Route path="/analytics" element={<AnalyticsPage />} />
+          <Route path="/collections" element={<CollectionsPage />} />
+          <Route path="/collections/:id" element={<CollectionDetailPage />} />
         </Routes>
       </div>
     </Router>

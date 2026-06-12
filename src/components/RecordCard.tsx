@@ -5,7 +5,7 @@ import { formatDate, getPlanetByName, getSignByName, getHouseByNumber } from '@/
 import { generateDivinationInterpretation } from '@/utils/divinationData';
 import TypeTag from './TypeTag';
 import Dice3D from './Dice3D';
-import { Trash2, ChevronDown, ChevronUp, Sparkles } from 'lucide-react';
+import { Trash2, ChevronDown, ChevronUp, Sparkles, FolderPlus, Check, Folder } from 'lucide-react';
 
 interface RecordCardProps {
   record: DiceRecord;
@@ -30,8 +30,25 @@ const MiniDice: React.FC<{
 );
 
 const RecordCard: React.FC<RecordCardProps> = ({ record }) => {
-  const { deleteRecord } = useDiceStore();
+  const { deleteRecord, collections, addRecordToCollection, removeRecordFromCollection, getCollectionsForRecord } = useDiceStore();
   const [expanded, setExpanded] = useState(false);
+  const [showCollectionMenu, setShowCollectionMenu] = useState(false);
+
+  const recordCollections = useMemo(() => {
+    return getCollectionsForRecord(record.id);
+  }, [record.id, getCollectionsForRecord, collections]);
+
+  const isInCollection = (collectionId: string) => {
+    return recordCollections.some((c) => c.id === collectionId);
+  };
+
+  const toggleCollection = (collectionId: string) => {
+    if (isInCollection(collectionId)) {
+      removeRecordFromCollection(collectionId, record.id);
+    } else {
+      addRecordToCollection(collectionId, record.id);
+    }
+  };
 
   const planet = getPlanetByName(record.planet);
   const sign = getSignByName(record.sign);
@@ -97,6 +114,66 @@ const RecordCard: React.FC<RecordCardProps> = ({ record }) => {
 
         <div className="flex items-center gap-2">
           <TypeTag typeId={record.questionType} />
+          <div className="relative">
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                setShowCollectionMenu(!showCollectionMenu);
+              }}
+              className="p-2 rounded-lg text-indigo-300/50 hover:text-violet-400 hover:bg-violet-500/10 opacity-0 group-hover:opacity-100 transition-all"
+            >
+              <FolderPlus size={16} />
+            </button>
+
+            {showCollectionMenu && (
+              <>
+                <div
+                  className="fixed inset-0 z-20"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setShowCollectionMenu(false);
+                  }}
+                />
+                <div className="absolute right-0 top-full mt-2 z-30 w-56 p-2 rounded-xl bg-indigo-950 border border-white/10 shadow-2xl">
+                  <div className="text-xs text-indigo-300/60 px-2 py-1.5 mb-1">添加到合集</div>
+                  {collections.length === 0 ? (
+                    <div className="px-3 py-4 text-center text-sm text-indigo-300/50">
+                      暂无合集，先去创建一个吧
+                    </div>
+                  ) : (
+                    <div className="space-y-0.5 max-h-60 overflow-y-auto">
+                      {collections.map((collection) => {
+                        const inCollection = isInCollection(collection.id);
+                        return (
+                          <button
+                            key={collection.id}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              toggleCollection(collection.id);
+                            }}
+                            className={`w-full flex items-center gap-2 px-2.5 py-2 rounded-lg text-left text-sm transition-all ${
+                              inCollection
+                                ? 'bg-violet-500/20 text-white'
+                                : 'text-indigo-200/70 hover:bg-white/5 hover:text-white'
+                            }`}
+                          >
+                            <Folder
+                              size={16}
+                              style={{ color: inCollection ? collection.color : undefined }}
+                              className={inCollection ? '' : 'text-indigo-400/50'}
+                            />
+                            <span className="flex-1 truncate">{collection.name}</span>
+                            {inCollection && <Check size={14} className="text-violet-400" />}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  )}
+                </div>
+              </>
+            )}
+          </div>
+
           <button
             onClick={handleDelete}
             className="p-2 rounded-lg text-indigo-300/50 hover:text-rose-400 hover:bg-rose-500/10 opacity-0 group-hover:opacity-100 transition-all"
