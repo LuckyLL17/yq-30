@@ -1,6 +1,7 @@
 import React, { useState, useMemo } from 'react';
 import { DiceRecord, DiceResult } from '@/types';
 import { useDiceStore } from '@/store/useDiceStore';
+import { useQuestionType } from '@/hooks/useQuestionType';
 import { formatDate, getPlanetByName, getSignByName, getHouseByNumber } from '@/utils/diceData';
 import { generateDivinationInterpretation } from '@/utils/divinationData';
 import TypeTag from './TypeTag';
@@ -31,6 +32,7 @@ const MiniDice: React.FC<{
 
 const RecordCard: React.FC<RecordCardProps> = ({ record }) => {
   const { deleteRecord, collections, addRecordToCollection, removeRecordFromCollection, getCollectionsForRecord } = useDiceStore();
+  const questionType = useQuestionType(record.questionType);
   const [expanded, setExpanded] = useState(false);
   const [showCollectionMenu, setShowCollectionMenu] = useState(false);
 
@@ -113,7 +115,9 @@ const RecordCard: React.FC<RecordCardProps> = ({ record }) => {
         </div>
 
         <div className="flex items-center gap-2">
-          <TypeTag typeId={record.questionType} />
+          {questionType && (
+            <TypeTag name={questionType.name} color={questionType.color} />
+          )}
           <div className="relative">
             <button
               onClick={(e) => {

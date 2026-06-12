@@ -187,6 +187,14 @@ export interface TypeDistribution {
   };
 }
 
+export interface TypeDistributionItem {
+  typeId: string;
+  name: string;
+  color: string;
+  count: number;
+  percentage: string;
+}
+
 export interface ChartDataItem {
   name: string;
   value: number;
